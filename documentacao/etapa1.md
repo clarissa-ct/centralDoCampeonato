@@ -1,10 +1,9 @@
-# FutGestor
-
 ## Sistema para gerenciamento de campeonatos de futebol
 
 ### Desenvolvimento
 
-Nome: Clarissa Cesar Tomaz
+Nome: Clarissa Cesar Tomaz 
+Eduardo Ferreira Satler
 
 Matrícula: 22.1.8026
 
