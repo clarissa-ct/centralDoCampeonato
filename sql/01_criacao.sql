@@ -1,12 +1,4 @@
--- =====================================================
--- FUTGESTOR
 -- Sistema de Gerenciamento de Campeonatos de Futebol
--- Script de criação das tabelas
--- =====================================================
-
--- =====================================================
--- Usuários do sistema
--- =====================================================
 
 CREATE TABLE usuario (
     id_usuario INTEGER,
@@ -105,11 +97,6 @@ CREATE TABLE estadio (
         CHECK (capacidade > 0)
 );
 
-
--- =====================================================
--- Tabela associativa entre campeonato e time
--- =====================================================
-
 CREATE TABLE inscricao_time (
     id_campeonato INTEGER NOT NULL,
     id_time INTEGER NOT NULL,
@@ -125,11 +112,6 @@ CREATE TABLE inscricao_time (
         FOREIGN KEY (id_time)
         REFERENCES time (id_time)
 );
-
-
--- =====================================================
--- Elenco dos times em cada campeonato
--- =====================================================
 
 CREATE TABLE elenco (
     id_campeonato INTEGER NOT NULL,
@@ -171,10 +153,6 @@ CREATE TABLE elenco (
         )
 );
 
-
--- =====================================================
--- Partidas dos campeonatos
--- =====================================================
 
 CREATE TABLE partida (
     id_partida INTEGER,
@@ -268,10 +246,6 @@ CREATE TABLE partida (
         )
 );
 
-
--- =====================================================
--- Gols registrados nas partidas
--- =====================================================
 
 CREATE TABLE gol (
     id_gol INTEGER,

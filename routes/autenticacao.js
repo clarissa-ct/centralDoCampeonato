@@ -4,7 +4,6 @@ const pool = require('../config/database');
 
 const router = express.Router();
 
-// Exibe a página de login.
 router.get('/login', (req, res) => {
     if (req.session.usuario) {
         return res.redirect('/');
@@ -19,7 +18,6 @@ router.get('/login', (req, res) => {
     });
 });
 
-// Verifica o e-mail e a senha.
 router.post('/login', async (req, res) => {
     const {
         email,
@@ -116,7 +114,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Exibe a página de cadastro.
 router.get('/cadastro', (req, res) => {
     if (req.session.usuario) {
         return res.redirect('/');
@@ -132,7 +129,6 @@ router.get('/cadastro', (req, res) => {
     );
 });
 
-// Cadastra um novo usuário.
 router.post('/cadastro', async (req, res) => {
     const {
         nome,
@@ -287,7 +283,6 @@ router.post('/cadastro', async (req, res) => {
     }
 });
 
-// Encerra a sessão.
 router.post('/sair', (req, res) => {
     req.session.destroy((erro) => {
         if (erro) {

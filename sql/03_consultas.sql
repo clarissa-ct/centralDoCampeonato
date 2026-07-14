@@ -1,14 +1,9 @@
--- =====================================================
--- FUTGESTOR
 -- Sistema de Gerenciamento de Campeonatos de Futebol
 -- Principais consultas do sistema
--- =====================================================
 
 
--- =====================================================
 -- CONSULTA 1
 -- Listar os campeonatos cadastrados
--- =====================================================
 
 SELECT
     C.id_campeonato,
@@ -23,10 +18,8 @@ ORDER BY
     C.nome;
 
 
--- =====================================================
 -- CONSULTA 2
 -- Listar os times cadastrados
--- =====================================================
 
 SELECT
     T.id_time,
@@ -37,10 +30,8 @@ FROM time T
 ORDER BY T.nome;
 
 
--- =====================================================
 -- CONSULTA 3
 -- Listar os jogadores cadastrados
--- =====================================================
 
 SELECT
     J.id_jogador,
@@ -51,10 +42,8 @@ FROM jogador J
 ORDER BY J.nome;
 
 
--- =====================================================
 -- CONSULTA 4
 -- Listar os times inscritos no campeonato 1
--- =====================================================
 
 SELECT
     C.nome AS campeonato,
@@ -73,10 +62,8 @@ WHERE
 ORDER BY T.nome;
 
 
--- =====================================================
 -- CONSULTA 5
 -- Listar o elenco do campeonato 1
--- =====================================================
 
 SELECT
     C.nome AS campeonato,
@@ -100,10 +87,8 @@ ORDER BY
     E.numero_camisa;
 
 
--- =====================================================
 -- CONSULTA 6
 -- Listar todas as partidas
--- =====================================================
 
 SELECT
     P.id_partida,
@@ -131,10 +116,8 @@ WHERE
 ORDER BY P.data_hora;
 
 
--- =====================================================
 -- CONSULTA 7
 -- Listar as partidas finalizadas
--- =====================================================
 
 SELECT
     P.id_partida,
@@ -158,10 +141,8 @@ WHERE
 ORDER BY P.data_hora;
 
 
--- =====================================================
 -- CONSULTA 8
 -- Listar as partidas agendadas
--- =====================================================
 
 SELECT
     P.id_partida,
@@ -186,10 +167,8 @@ WHERE
 ORDER BY P.data_hora;
 
 
--- =====================================================
 -- CONSULTA 9
 -- Listar os gols registrados
--- =====================================================
 
 SELECT
     G.id_gol,
@@ -224,11 +203,9 @@ ORDER BY
     G.id_gol;
 
 
--- =====================================================
 -- CONSULTA 10
 -- Apresentar a artilharia do campeonato 1
 -- Gols contra não são contabilizados
--- =====================================================
 
 SELECT
     J.id_jogador,
@@ -258,15 +235,12 @@ ORDER BY
     J.nome;
 
 
--- =====================================================
 -- CONSULTA 11
 -- Apresentar a classificação do campeonato 1
---
 -- Critérios:
 -- vitória = 3 pontos
 -- empate = 1 ponto
 -- derrota = 0 pontos
--- =====================================================
 
 SELECT
     T.id_time,
@@ -294,9 +268,6 @@ FROM
     time T,
 
     (
-        -- Inclui todos os times inscritos,
-        -- mesmo aqueles que ainda não jogaram.
-
         SELECT
             I.id_campeonato,
             I.id_time,
@@ -309,11 +280,7 @@ FROM
             0 AS pontos
         FROM inscricao_time I
 
-
         UNION ALL
-
-
-        -- Time mandante venceu.
 
         SELECT
             P.id_campeonato,
@@ -334,9 +301,6 @@ FROM
 
         UNION ALL
 
-
-        -- Time visitante perdeu.
-
         SELECT
             P.id_campeonato,
             P.id_time_visitante AS id_time,
@@ -353,11 +317,7 @@ FROM
             AND P.gols_mandante
                 > P.gols_visitante
 
-
         UNION ALL
-
-
-        -- Time visitante venceu.
 
         SELECT
             P.id_campeonato,
@@ -375,11 +335,7 @@ FROM
             AND P.gols_visitante
                 > P.gols_mandante
 
-
         UNION ALL
-
-
-        -- Time mandante perdeu.
 
         SELECT
             P.id_campeonato,
@@ -397,11 +353,7 @@ FROM
             AND P.gols_visitante
                 > P.gols_mandante
 
-
         UNION ALL
-
-
-        -- Empate do time mandante.
 
         SELECT
             P.id_campeonato,
@@ -419,11 +371,7 @@ FROM
             AND P.gols_mandante
                 = P.gols_visitante
 
-
         UNION ALL
-
-
-        -- Empate do time visitante.
 
         SELECT
             P.id_campeonato,
