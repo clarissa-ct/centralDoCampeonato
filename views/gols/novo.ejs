@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Registro de gol</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/gols">Gols</a> <span>/</span>
+            <span>Novo</span>
+        </nav>
+
+        <section class="conteudo conteudo-form">
+            <h2>Registrar gol</h2>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <% if (partidas.length === 0) { %>
+                <div class="mensagem erro">
+                    Não existem partidas finalizadas.
+                </div>
+            <% } else { %>
+                <form action="/gols" method="POST">
+                    <div class="campo">
+                        <label for="id_partida">
+                            Partida
+                        </label>
+
+                        <select
+                            id="id_partida"
+                            name="id_partida"
+                            required
+                        >
+                            <option value="">Selecione</option>
+
+                            <% partidas.forEach((partida) => { %>
+                                <option
+                                    value="<%= partida.id_partida %>"
+                                    <%= String(dados.id_partida)
+                                        === String(partida.id_partida)
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    <%= partida.campeonato %>
+                                    -
+                                    <%= partida.ano %>
+                                    |
+                                    Rodada <%= partida.rodada %>
+                                    |
+                                    <%= partida.time_mandante %>
+                                    <%= partida.gols_mandante %>
+                                    x
+                                    <%= partida.gols_visitante %>
+                                    <%= partida.time_visitante %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_jogador">
+                            Jogador
+                        </label>
+
+                        <select
+                            id="id_jogador"
+                            name="id_jogador"
+                            required
+                        >
+                            <option value="">Selecione</option>
+
+                            <% jogadores.forEach((item) => { %>
+                                <option
+                                    value="<%= item.id_jogador %>"
+                                    data-partida="<%= item.id_partida %>"
+                                    <%= String(dados.id_jogador)
+                                        === String(item.id_jogador)
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    <%= item.jogador %>
+                                    -
+                                    <%= item.time %>
+                                    -
+                                    <%= item.posicao %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="grade-campos">
+                        <div class="campo campo-estreito">
+                            <label for="minuto">Minuto</label>
+
+                            <input
+                                type="number"
+                                id="minuto"
+                                name="minuto"
+                                min="0"
+                                step="1"
+                                value="<%= dados.minuto || '' %>"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="tipo">Tipo do gol</label>
+
+                            <select id="tipo" name="tipo" required>
+                                <option value="">Selecione</option>
+
+                                <option
+                                    value="normal"
+                                    <%= dados.tipo === 'normal'
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    Normal
+                                </option>
+
+                                <option
+                                    value="pênalti"
+                                    <%= dados.tipo === 'pênalti'
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    Pênalti
+                                </option>
+
+                                <option
+                                    value="falta"
+                                    <%= dados.tipo === 'falta'
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    Falta
+                                </option>
+
+                                <option
+                                    value="contra"
+                                    <%= dados.tipo === 'contra'
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    Contra
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="acoes">
+                        <button class="botao" type="submit">
+                            Registrar gol
+                        </button>
+
+                        <a
+                            class="botao secundario"
+                            href="/gols"
+                        >
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            <% } %>
+        </section>
+    </main>
+
+    <script>
+        const partida = document.getElementById(
+            'id_partida'
+        );
+
+        const jogador = document.getElementById(
+            'id_jogador'
+        );
+
+        function filtrarJogadores() {
+            const partidaSelecionada = partida.value;
+
+            Array.from(jogador.options).forEach((option) => {
+                if (!option.value) {
+                    option.hidden = false;
+                    return;
+                }
+
+                option.hidden =
+                    option.dataset.partida
+                    !== partidaSelecionada;
+            });
+
+            const opcaoSelecionada =
+                jogador.options[jogador.selectedIndex];
+
+            if (
+                opcaoSelecionada &&
+                opcaoSelecionada.value &&
+                opcaoSelecionada.hidden
+            ) {
+                jogador.value = '';
+            }
+        }
+
+        partida.addEventListener(
+            'change',
+            filtrarJogadores
+        );
+
+        filtrarJogadores();
+    </script>
+</body>
+</html>

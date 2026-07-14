@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Gerenciamento de campeonatos de futebol</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span> <span>Partidas</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Partidas</h2>
+
+                <p>
+                    Jogos cadastrados nos campeonatos.
+                </p>
+            </div>
+
+            <a class="botao" href="/partidas/nova">
+                + Nova partida
+            </a>
+        </div>
+
+        <% if (sucesso) { %>
+            <div class="mensagem sucesso">
+                Partida cadastrada com sucesso.
+            </div>
+        <% } %>
+
+        <% if (resultadoRegistrado) { %>
+            <div class="mensagem sucesso">
+                Resultado registrado com sucesso.
+            </div>
+        <% } %>
+
+        <section class="conteudo">
+            <% if (partidas.length === 0) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">📅</span>
+                    <p>Nenhuma partida cadastrada.</p>
+                    <a class="botao" href="/partidas/nova">Cadastrar a primeira</a>
+                </div>
+            <% } else { %>
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Campeonato</th>
+                                <th>Rodada</th>
+                                <th>Partida</th>
+                                <th>Data e hora</th>
+                                <th>Estádio</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% partidas.forEach((partida) => { %>
+                                <tr>
+                                    <td>
+                                        <%= partida.campeonato %>
+                                        -
+                                        <%= partida.ano %>
+                                    </td>
+
+                                    <td><%= partida.rodada %></td>
+
+                                    <td class="celula-partida">
+                                        <span class="celula-forte"><%= partida.time_mandante %></span>
+
+                                        <% if (
+                                            partida.status === 'finalizada'
+                                        ) { %>
+                                            <strong class="placar">
+                                                <%= partida.gols_mandante %>
+                                                x
+                                                <%= partida.gols_visitante %>
+                                            </strong>
+                                        <% } else { %>
+                                            <span class="versus-tabela">x</span>
+                                        <% } %>
+
+                                        <span class="celula-forte"><%= partida.time_visitante %></span>
+                                    </td>
+
+                                    <td><%= partida.data_hora %></td>
+
+                                    <td><%= partida.estadio %></td>
+
+                                    <td>
+                                        <span class="badge badge-<%= partida.status %>">
+                                            <%= partida.status %>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <% if (partida.status === 'agendada') { %>
+                                            <a
+                                                class="botao pequeno"
+                                                href="/partidas/<%= partida.id_partida %>/resultado"
+                                            >
+                                                Registrar resultado
+                                            </a>
+                                        <% } else { %>
+                                            <span class="sem-acao">—</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </section>
+
+        <p class="voltar">
+            <a href="/">← Voltar para a página inicial</a>
+        </p>
+    </main>
+</body>
+</html>

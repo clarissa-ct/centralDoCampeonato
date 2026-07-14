@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Cadastro de partida</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/partidas">Partidas</a> <span>/</span>
+            <span>Nova</span>
+        </nav>
+
+        <section class="conteudo conteudo-form">
+            <h2>Nova partida</h2>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <% if (
+                campeonatos.length === 0 ||
+                estadios.length === 0 ||
+                inscricoes.length === 0
+            ) { %>
+                <div class="mensagem erro">
+                    É necessário possuir campeonatos, estádios
+                    e times inscritos.
+                </div>
+            <% } else { %>
+                <form action="/partidas" method="POST">
+                    <div class="campo">
+                        <label for="id_campeonato">
+                            Campeonato
+                        </label>
+
+                        <select
+                            id="id_campeonato"
+                            name="id_campeonato"
+                            required
+                        >
+                            <option value="">Selecione</option>
+
+                            <% campeonatos.forEach((campeonato) => { %>
+                                <option
+                                    value="<%= campeonato.id_campeonato %>"
+                                    <%= String(dados.id_campeonato)
+                                        === String(
+                                            campeonato.id_campeonato
+                                        )
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    <%= campeonato.nome %>
+                                    -
+                                    <%= campeonato.ano %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="grade-campos">
+                        <div class="campo">
+                            <label for="id_time_mandante">
+                                Time mandante
+                            </label>
+
+                            <select
+                                id="id_time_mandante"
+                                name="id_time_mandante"
+                                required
+                            >
+                                <option value="">Selecione</option>
+
+                                <% inscricoes.forEach((item) => { %>
+                                    <option
+                                        value="<%= item.id_time %>"
+                                        data-campeonato="<%= item.id_campeonato %>"
+                                        <%= String(dados.id_time_mandante)
+                                            === String(item.id_time)
+                                            ? 'selected'
+                                            : '' %>
+                                    >
+                                        <%= item.time %>
+                                        |
+                                        <%= item.campeonato %>
+                                        -
+                                        <%= item.ano %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label for="id_time_visitante">
+                                Time visitante
+                            </label>
+
+                            <select
+                                id="id_time_visitante"
+                                name="id_time_visitante"
+                                required
+                            >
+                                <option value="">Selecione</option>
+
+                                <% inscricoes.forEach((item) => { %>
+                                    <option
+                                        value="<%= item.id_time %>"
+                                        data-campeonato="<%= item.id_campeonato %>"
+                                        <%= String(dados.id_time_visitante)
+                                            === String(item.id_time)
+                                            ? 'selected'
+                                            : '' %>
+                                    >
+                                        <%= item.time %>
+                                        |
+                                        <%= item.campeonato %>
+                                        -
+                                        <%= item.ano %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_estadio">Estádio</label>
+
+                        <select
+                            id="id_estadio"
+                            name="id_estadio"
+                            required
+                        >
+                            <option value="">Selecione</option>
+
+                            <% estadios.forEach((estadio) => { %>
+                                <option
+                                    value="<%= estadio.id_estadio %>"
+                                    <%= String(dados.id_estadio)
+                                        === String(estadio.id_estadio)
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    <%= estadio.nome %>
+                                    -
+                                    <%= estadio.cidade %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="grade-campos">
+                        <div class="campo campo-estreito">
+                            <label for="rodada">Rodada</label>
+
+                            <input
+                                type="number"
+                                id="rodada"
+                                name="rodada"
+                                min="1"
+                                step="1"
+                                value="<%= dados.rodada || '' %>"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="data_hora">
+                                Data e horário
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                id="data_hora"
+                                name="data_hora"
+                                value="<%= dados.data_hora || '' %>"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="acoes">
+                        <button class="botao" type="submit">
+                            Cadastrar partida
+                        </button>
+
+                        <a
+                            class="botao secundario"
+                            href="/partidas"
+                        >
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            <% } %>
+        </section>
+    </main>
+
+    <script>
+        const campeonato = document.getElementById(
+            'id_campeonato'
+        );
+
+        const mandante = document.getElementById(
+            'id_time_mandante'
+        );
+
+        const visitante = document.getElementById(
+            'id_time_visitante'
+        );
+
+        function filtrarTimes(select) {
+            const campeonatoSelecionado = campeonato.value;
+
+            Array.from(select.options).forEach((option) => {
+                if (!option.value) {
+                    option.hidden = false;
+                    return;
+                }
+
+                option.hidden =
+                    option.dataset.campeonato
+                    !== campeonatoSelecionado;
+            });
+
+            const opcaoSelecionada =
+                select.options[select.selectedIndex];
+
+            if (
+                opcaoSelecionada &&
+                opcaoSelecionada.value &&
+                opcaoSelecionada.hidden
+            ) {
+                select.value = '';
+            }
+        }
+
+        function atualizarTimes() {
+            filtrarTimes(mandante);
+            filtrarTimes(visitante);
+        }
+
+        campeonato.addEventListener(
+            'change',
+            atualizarTimes
+        );
+
+        atualizarTimes();
+    </script>
+</body>
+</html>

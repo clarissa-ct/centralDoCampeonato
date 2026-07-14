@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<% if (cadastroRealizado) { %>
+    <div class="mensagem sucesso">
+        Cadastro realizado com sucesso. Entre com seu e-mail e senha.
+    </div>
+<% } %>
+
+<body class="pagina-login">
+    <main class="login-container">
+        <section class="login-caixa">
+            <div class="login-cabecalho">
+                <span class="login-logo">⚽</span>
+
+                <h1>Central do Campeonato</h1>
+
+                <p>
+                    Sistema de gerenciamento de campeonatos
+                    de futebol
+                </p>
+            </div>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="campo">
+                    <label for="email">E-mail</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="<%= dados.email || '' %>"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="senha">Senha</label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button
+                    class="botao botao-login"
+                    type="submit"
+                >
+                    Entrar
+                </button>
+            </form>
+            <p class="login-link">
+    Ainda não possui uma conta?
+    <a href="/cadastro">Cadastre-se</a>
+</p>
+        </section>
+    </main>
+</body>
+</html>

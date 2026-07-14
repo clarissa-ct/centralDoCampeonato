@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %></title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo">
+        <div class="marca">
+            <span class="logo">⚽</span>
+
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Sistema de gerenciamento de campeonatos</p>
+            </div>
+        </div>
+        <div class="usuario-logado">
+            <span>
+                Olá, <strong><%= usuario.nome %></strong>
+            </span>
+
+            <form action="/sair" method="POST">
+                <button
+                    class="botao-sair"
+                    type="submit"
+                >
+                    Sair
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        <section class="boas-vindas">
+            <h2>Painel do campeonato</h2>
+
+            <p>
+                Acesse uma das opções abaixo para cadastrar
+                informações ou consultar os dados do campeonato.
+            </p>
+        </section>
+
+        <section class="grade-modulos">
+            <a class="card" href="/campeonatos">
+                <span class="card-titulo">
+                    Campeonatos
+                </span>
+
+                <span class="card-desc">
+                    Cadastro e informações dos campeonatos
+                </span>
+            </a>
+
+            <a class="card" href="/times">
+                <span class="card-titulo">
+                    Times
+                </span>
+
+                <span class="card-desc">
+                    Cadastro dos times participantes
+                </span>
+            </a>
+
+            <a class="card" href="/jogadores">
+                <span class="card-titulo">
+                    Jogadores
+                </span>
+
+                <span class="card-desc">
+                    Cadastro dos jogadores
+                </span>
+            </a>
+
+            <a class="card" href="/estadios">
+                <span class="card-titulo">
+                    Estádios
+                </span>
+
+                <span class="card-desc">
+                    Cadastro dos locais das partidas
+                </span>
+            </a>
+
+            <a class="card" href="/inscricoes">
+                <span class="card-titulo">
+                    Inscrições
+                </span>
+
+                <span class="card-desc">
+                    Inscrição dos times nos campeonatos
+                </span>
+            </a>
+
+            <a class="card" href="/elencos">
+                <span class="card-titulo">
+                    Elencos
+                </span>
+
+                <span class="card-desc">
+                    Jogadores e números de camisa
+                </span>
+            </a>
+
+            <a class="card" href="/partidas">
+                <span class="card-titulo">
+                    Partidas
+                </span>
+
+                <span class="card-desc">
+                    Cadastro dos jogos e resultados
+                </span>
+            </a>
+
+            <a class="card" href="/gols">
+                <span class="card-titulo">
+                    Gols
+                </span>
+
+                <span class="card-desc">
+                    Registro dos gols das partidas
+                </span>
+            </a>
+
+            <a class="card destaque" href="/consultas">
+                <span class="card-titulo">
+                    Classificação e artilharia
+                </span>
+
+                <span class="card-desc">
+                    Consulta da tabela e dos artilheiros
+                </span>
+            </a>
+        </section>
+    </main>
+</body>
+</html>

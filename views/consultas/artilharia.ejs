@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Artilharia do campeonato</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/consultas">Consultas</a> <span>/</span>
+            <span>Artilharia</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Artilharia</h2>
+
+                <p>
+                    <%= campeonato.nome %>
+                    -
+                    <%= campeonato.ano %>
+                </p>
+            </div>
+        </div>
+
+        <section class="conteudo">
+            <% if (artilharia.length === 0) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">🥅</span>
+                    <p>Nenhum gol válido registrado neste campeonato.</p>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pos.</th>
+                            <th>Jogador</th>
+                            <th>Time</th>
+                            <th>Gols</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% artilharia.forEach((item, indice) => { %>
+                            <tr>
+                                <td>
+                                    <span class="posicao posicao-<%= indice + 1 %>">
+                                        <%= indice + 1 %>
+                                    </span>
+                                </td>
+                                <td class="celula-forte"><%= item.jogador %></td>
+                                <td><%= item.time %></td>
+                                <td>
+                                    <strong class="pontos">
+                                        <%= item.quantidade_gols %>
+                                    </strong>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </section>
+
+        <div class="acoes">
+            <a class="botao secundario" href="/consultas">
+                Voltar para consultas
+            </a>
+
+            <a class="botao secundario" href="/">
+                Página inicial
+            </a>
+        </div>
+    </main>
+</body>
+</html>

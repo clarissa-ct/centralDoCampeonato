@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Inscrição de time em campeonato</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/inscricoes">Inscrições</a> <span>/</span>
+            <span>Nova</span>
+        </nav>
+
+        <section class="conteudo conteudo-form">
+            <h2>Nova inscrição</h2>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <% if (
+                campeonatos.length === 0 ||
+                times.length === 0
+            ) { %>
+                <div class="mensagem erro">
+                    É necessário possuir pelo menos um campeonato
+                    e um time cadastrados.
+                </div>
+            <% } else { %>
+                <form action="/inscricoes" method="POST">
+                    <div class="campo">
+                        <label for="id_campeonato">
+                            Campeonato
+                        </label>
+
+                        <select
+                            id="id_campeonato"
+                            name="id_campeonato"
+                            required
+                        >
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            <% campeonatos.forEach((campeonato) => { %>
+                                <option
+                                    value="<%= campeonato.id_campeonato %>"
+                                    <%= String(dados.id_campeonato)
+                                        === String(campeonato.id_campeonato)
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    <%= campeonato.nome %>
+                                    -
+                                    <%= campeonato.ano %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="id_time">Time</label>
+
+                        <select
+                            id="id_time"
+                            name="id_time"
+                            required
+                        >
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            <% times.forEach((time) => { %>
+                                <option
+                                    value="<%= time.id_time %>"
+                                    <%= String(dados.id_time)
+                                        === String(time.id_time)
+                                        ? 'selected'
+                                        : '' %>
+                                >
+                                    <%= time.nome %>
+                                    -
+                                    <%= time.cidade %>/<%= time.estado %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="acoes">
+                        <button class="botao" type="submit">
+                            Inscrever time
+                        </button>
+
+                        <a
+                            class="botao secundario"
+                            href="/inscricoes"
+                        >
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            <% } %>
+        </section>
+    </main>
+</body>
+</html>

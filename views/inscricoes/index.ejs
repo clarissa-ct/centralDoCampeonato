@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Gerenciamento de campeonatos de futebol</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span> <span>Inscrições</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Inscrições de times</h2>
+
+                <p>
+                    Times inscritos nos campeonatos.
+                </p>
+            </div>
+
+            <a class="botao" href="/inscricoes/nova">
+                + Nova inscrição
+            </a>
+        </div>
+
+        <% if (sucesso) { %>
+            <div class="mensagem sucesso">
+                Time inscrito com sucesso.
+            </div>
+        <% } %>
+
+        <section class="conteudo">
+            <% if (inscricoes.length === 0) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">📋</span>
+                    <p>Nenhuma inscrição cadastrada.</p>
+                    <a class="botao" href="/inscricoes/nova">Cadastrar a primeira</a>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Campeonato</th>
+                            <th>Ano</th>
+                            <th>Time</th>
+                            <th>Cidade</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% inscricoes.forEach((inscricao) => { %>
+                            <tr>
+                                <td class="celula-forte">
+                                    <%= inscricao.campeonato %>
+                                </td>
+
+                                <td><%= inscricao.ano %></td>
+
+                                <td><%= inscricao.time %></td>
+
+                                <td><%= inscricao.cidade %></td>
+
+                                <td><%= inscricao.estado %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </section>
+
+        <p class="voltar">
+            <a href="/">← Voltar para a página inicial</a>
+        </p>
+    </main>
+</body>
+</html>

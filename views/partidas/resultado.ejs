@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Registro de resultado</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/partidas">Partidas</a> <span>/</span>
+            <span>Resultado</span>
+        </nav>
+
+        <section class="conteudo conteudo-form">
+            <h2>Registrar resultado</h2>
+
+            <div class="ficha-partida">
+                <span><strong>Campeonato:</strong> <%= partida.campeonato %> - <%= partida.ano %></span>
+                <span><strong>Rodada:</strong> <%= partida.rodada %></span>
+            </div>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <form
+                action="/partidas/<%= partida.id_partida %>/resultado"
+                method="POST"
+            >
+                <div class="placar-formulario">
+                    <div class="campo">
+                        <label for="gols_mandante">
+                            <%= partida.time_mandante %>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="gols_mandante"
+                            name="gols_mandante"
+                            min="0"
+                            step="1"
+                            value="<%= dados.gols_mandante ?? '' %>"
+                            required
+                        >
+                    </div>
+
+                    <span class="versus">x</span>
+
+                    <div class="campo">
+                        <label for="gols_visitante">
+                            <%= partida.time_visitante %>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="gols_visitante"
+                            name="gols_visitante"
+                            min="0"
+                            step="1"
+                            value="<%= dados.gols_visitante ?? '' %>"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="acoes">
+                    <button class="botao" type="submit">
+                        Salvar resultado
+                    </button>
+
+                    <a
+                        class="botao secundario"
+                        href="/partidas"
+                    >
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

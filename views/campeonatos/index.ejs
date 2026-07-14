@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Gerenciamento de campeonatos de futebol</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span> <span>Campeonatos</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Campeonatos</h2>
+                <p>Campeonatos cadastrados no sistema.</p>
+            </div>
+
+            <a class="botao" href="/campeonatos/novo">
+                + Novo campeonato
+            </a>
+        </div>
+
+        <% if (sucesso) { %>
+            <div class="mensagem sucesso">
+                Campeonato cadastrado com sucesso.
+            </div>
+        <% } %>
+
+        <section class="conteudo">
+            <% if (campeonatos.length === 0) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">🏆</span>
+                    <p>Nenhum campeonato cadastrado.</p>
+                    <a class="botao" href="/campeonatos/novo">Cadastrar o primeiro</a>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Ano</th>
+                            <th>Início</th>
+                            <th>Término</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% campeonatos.forEach((campeonato) => { %>
+                            <tr>
+                                <td class="celula-forte"><%= campeonato.nome %></td>
+                                <td><%= campeonato.ano %></td>
+                                <td><%= campeonato.data_inicio %></td>
+                                <td><%= campeonato.data_fim %></td>
+                                <td>
+                                    <span class="badge badge-<%= campeonato.status.replace(' ', '-') %>">
+                                        <%= campeonato.status %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </section>
+
+        <p class="voltar">
+            <a href="/">← Voltar para a página inicial</a>
+        </p>
+    </main>
+</body>
+</html>

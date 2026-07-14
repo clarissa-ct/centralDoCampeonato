@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Cadastro de campeonato</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/campeonatos">Campeonatos</a> <span>/</span>
+            <span>Novo</span>
+        </nav>
+
+        <section class="conteudo conteudo-form">
+            <h2>Novo campeonato</h2>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <form action="/campeonatos" method="POST">
+                <div class="campo">
+                    <label for="nome">Nome</label>
+
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="100"
+                        value="<%= dados.nome || '' %>"
+                        required
+                    >
+                </div>
+
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="ano">Ano</label>
+
+                        <input
+                            type="number"
+                            id="ano"
+                            name="ano"
+                            min="1900"
+                            value="<%= dados.ano || '' %>"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="status">Status</label>
+
+                        <select id="status" name="status" required>
+                            <option value="">Selecione</option>
+
+                            <option
+                                value="planejado"
+                                <%= dados.status === 'planejado'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Planejado
+                            </option>
+
+                            <option
+                                value="em andamento"
+                                <%= dados.status === 'em andamento'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Em andamento
+                            </option>
+
+                            <option
+                                value="finalizado"
+                                <%= dados.status === 'finalizado'
+                                    ? 'selected'
+                                    : '' %>
+                            >
+                                Finalizado
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="data_inicio">Data de início</label>
+
+                        <input
+                            type="date"
+                            id="data_inicio"
+                            name="data_inicio"
+                            value="<%= dados.data_inicio || '' %>"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="data_fim">Data de término</label>
+
+                        <input
+                            type="date"
+                            id="data_fim"
+                            name="data_fim"
+                            value="<%= dados.data_fim || '' %>"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="acoes">
+                    <button class="botao" type="submit">
+                        Cadastrar
+                    </button>
+
+                    <a
+                        class="botao secundario"
+                        href="/campeonatos"
+                    >
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

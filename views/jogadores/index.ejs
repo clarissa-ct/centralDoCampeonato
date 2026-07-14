@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Gerenciamento de campeonatos de futebol</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span> <span>Jogadores</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Jogadores</h2>
+                <p>Jogadores cadastrados no sistema.</p>
+            </div>
+
+            <a class="botao" href="/jogadores/novo">
+                + Novo jogador
+            </a>
+        </div>
+
+        <% if (sucesso) { %>
+            <div class="mensagem sucesso">
+                Jogador cadastrado com sucesso.
+            </div>
+        <% } %>
+
+        <section class="conteudo">
+            <% if (jogadores.length === 0) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">👤</span>
+                    <p>Nenhum jogador cadastrado.</p>
+                    <a class="botao" href="/jogadores/novo">Cadastrar o primeiro</a>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Data de nascimento</th>
+                            <th>Posição</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% jogadores.forEach((jogador) => { %>
+                            <tr>
+                                <td class="celula-forte"><%= jogador.nome %></td>
+                                <td>
+                                    <%= jogador.data_nascimento %>
+                                </td>
+                                <td>
+                                    <span class="badge badge-posicao">
+                                        <%= jogador.posicao %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </section>
+
+        <p class="voltar">
+            <a href="/">← Voltar para a página inicial</a>
+        </p>
+    </main>
+</body>
+</html>

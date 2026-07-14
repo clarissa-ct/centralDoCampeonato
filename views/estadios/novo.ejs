@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Cadastro de estádio</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span>
+            <a href="/estadios">Estádios</a> <span>/</span>
+            <span>Novo</span>
+        </nav>
+
+        <section class="conteudo conteudo-form">
+            <h2>Novo estádio</h2>
+
+            <% if (erro) { %>
+                <div class="mensagem erro">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <form action="/estadios" method="POST">
+                <div class="campo">
+                    <label for="nome">Nome</label>
+
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="100"
+                        value="<%= dados.nome || '' %>"
+                        required
+                    >
+                </div>
+
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="cidade">Cidade</label>
+
+                        <input
+                            type="text"
+                            id="cidade"
+                            name="cidade"
+                            maxlength="100"
+                            value="<%= dados.cidade || '' %>"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="capacidade">Capacidade</label>
+
+                        <input
+                            type="number"
+                            id="capacidade"
+                            name="capacidade"
+                            min="1"
+                            step="1"
+                            value="<%= dados.capacidade || '' %>"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="acoes">
+                    <button class="botao" type="submit">
+                        Cadastrar
+                    </button>
+
+                    <a
+                        class="botao secundario"
+                        href="/estadios"
+                    >
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

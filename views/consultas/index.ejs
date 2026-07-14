@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Consultas dos campeonatos</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span> <span>Consultas</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Consultas</h2>
+
+                <p>
+                    Selecione um campeonato para visualizar
+                    a classificação ou a artilharia.
+                </p>
+            </div>
+        </div>
+
+        <% if (campeonatos.length === 0) { %>
+            <div class="mensagem erro">
+                Nenhum campeonato cadastrado.
+            </div>
+        <% } else { %>
+            <div class="grade-consultas">
+                <form
+                    class="cartao-consulta"
+                    action="/consultas/classificacao"
+                    method="GET"
+                >
+                    <span class="cartao-consulta-icone">📊</span>
+                    <h3>Classificação</h3>
+
+                    <p>
+                        Jogos, vitórias, empates, derrotas,
+                        gols, saldo e pontos.
+                    </p>
+
+                    <div class="campo">
+                        <label for="campeonato_classificacao">
+                            Campeonato
+                        </label>
+
+                        <select
+                            id="campeonato_classificacao"
+                            name="id_campeonato"
+                            required
+                        >
+                            <option value="">Selecione</option>
+
+                            <% campeonatos.forEach((campeonato) => { %>
+                                <option
+                                    value="<%= campeonato.id_campeonato %>"
+                                >
+                                    <%= campeonato.nome %>
+                                    -
+                                    <%= campeonato.ano %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <button class="botao" type="submit">
+                        Consultar classificação
+                    </button>
+                </form>
+
+                <form
+                    class="cartao-consulta"
+                    action="/consultas/artilharia"
+                    method="GET"
+                >
+                    <span class="cartao-consulta-icone">🥇</span>
+                    <h3>Artilharia</h3>
+
+                    <p>
+                        Jogadores ordenados pela quantidade
+                        de gols marcados.
+                    </p>
+
+                    <div class="campo">
+                        <label for="campeonato_artilharia">
+                            Campeonato
+                        </label>
+
+                        <select
+                            id="campeonato_artilharia"
+                            name="id_campeonato"
+                            required
+                        >
+                            <option value="">Selecione</option>
+
+                            <% campeonatos.forEach((campeonato) => { %>
+                                <option
+                                    value="<%= campeonato.id_campeonato %>"
+                                >
+                                    <%= campeonato.nome %>
+                                    -
+                                    <%= campeonato.ano %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <button class="botao" type="submit">
+                        Consultar artilharia
+                    </button>
+                </form>
+            </div>
+        <% } %>
+
+        <p class="voltar">
+            <a href="/">← Voltar para a página inicial</a>
+        </p>
+    </main>
+</body>
+</html>

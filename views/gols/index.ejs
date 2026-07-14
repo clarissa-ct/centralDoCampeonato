@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title><%= titulo %> | Central do Campeonato</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <header class="topo topo-interna">
+        <div class="marca">
+            <a class="logo-link" href="/">
+                <span class="logo">⚽</span>
+            </a>
+            <div>
+                <h1>Central do Campeonato</h1>
+                <p>Gerenciamento de campeonatos de futebol</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="trilha">
+            <a href="/">Início</a> <span>/</span> <span>Gols</span>
+        </nav>
+
+        <div class="barra-titulo">
+            <div>
+                <h2>Gols</h2>
+                <p>Gols registrados nas partidas.</p>
+            </div>
+
+            <a class="botao" href="/gols/novo">
+                + Registrar gol
+            </a>
+        </div>
+
+        <% if (sucesso) { %>
+            <div class="mensagem sucesso">
+                Gol registrado com sucesso.
+            </div>
+        <% } %>
+
+        <section class="conteudo">
+            <% if (gols.length === 0) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">🥅</span>
+                    <p>Nenhum gol registrado.</p>
+                    <a class="botao" href="/gols/novo">Registrar o primeiro</a>
+                </div>
+            <% } else { %>
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Campeonato</th>
+                                <th>Partida</th>
+                                <th>Jogador</th>
+                                <th>Time</th>
+                                <th>Minuto</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% gols.forEach((gol) => { %>
+                                <tr>
+                                    <td>
+                                        <%= gol.campeonato %>
+                                        -
+                                        <%= gol.ano %>
+                                    </td>
+
+                                    <td>
+                                        <%= gol.time_mandante %>
+                                        x
+                                        <%= gol.time_visitante %>
+                                    </td>
+
+                                    <td class="celula-forte"><%= gol.jogador %></td>
+
+                                    <td><%= gol.time_jogador %></td>
+
+                                    <td>
+                                        <span class="minuto-gol"><%= gol.minuto %>'</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge badge-tipo-gol">
+                                            <%= gol.tipo %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </section>
+
+        <p class="voltar">
+            <a href="/">← Voltar para a página inicial</a>
+        </p>
+    </main>
+</body>
+</html>
