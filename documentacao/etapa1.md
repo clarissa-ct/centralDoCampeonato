@@ -1,129 +1,135 @@
+# Central do Campeonato
+
 ## Sistema para gerenciamento de campeonatos de futebol
 
 ### Desenvolvimento
 
-Nome: Clarissa Cesar Tomaz 
-Eduardo Ferreira Satler
+**Integrantes:**
 
-Matrícula: 22.1.8026
+- Clarissa Cesar Tomaz  
+- Eduardo Ferreira Satler  
+
+**Matrícula:** 22.1.8026
 
 ---
 
 ## Sobre o projeto
 
-O FutGestor é um sistema web desenvolvido para auxiliar na organização
-de campeonatos de futebol.
+O **Central do Campeonato** é um sistema web criado para facilitar a organização de campeonatos de futebol.
 
-O sistema permitirá cadastrar campeonatos, times, jogadores, estádios,
-partidas e gols.
+A ideia é reunir, em um só lugar, as principais informações de um campeonato. No sistema será possível cadastrar campeonatos, times, jogadores, estádios, partidas e gols.
 
-Também será possível inscrever times em campeonatos, montar os elencos,
-registrar resultados e consultar a classificação e a artilharia.
+Também será possível inscrever os times nos campeonatos, montar os elencos, registrar os resultados das partidas e acompanhar informações como a classificação e a artilharia.
 
-A aplicação será desenvolvida utilizando Node.js, Express, EJS e
-PostgreSQL.
+O sistema será desenvolvido com **Node.js, Express, EJS e PostgreSQL**. A conexão com o banco de dados será feita utilizando o driver `pg`.
 
-A comunicação com o banco de dados será realizada pelo driver pg.
-Todos os comandos e consultas serão escritos diretamente em SQL,
-sem utilização de ORM.
+Os comandos utilizados para cadastrar, alterar, excluir e consultar os dados serão escritos diretamente em **SQL**, e poderão ser encontrados na pasta **sql** do projeto.
 
 ---
 
-## Requisitos e regras de negócio
+## Principais funcionalidades e regras
 
 ### Campeonatos
 
-1. O sistema deverá permitir o cadastro de campeonatos.
+O sistema permitirá cadastrar campeonatos informando:
 
-2. Cada campeonato deverá possuir nome, ano, data de início, data de
-término e status.
+- nome;
+- ano;
+- data de início;
+- data de término;
+- status.
 
-3. Os possíveis status de um campeonato serão: planejado, em andamento
-e finalizado.
+O campeonato poderá ter os seguintes status:
+
+- planejado;
+- em andamento;
+- finalizado.
 
 ### Times
 
-4. O sistema deverá permitir o cadastro de times.
+Será possível cadastrar os times participantes, informando o nome, a cidade e o estado.
 
-5. Cada time deverá possuir nome, cidade e estado.
+Um time poderá participar de vários campeonatos, e um campeonato poderá ter vários times inscritos.
 
-6. Um time poderá participar de vários campeonatos.
-
-7. Um campeonato poderá possuir vários times.
-
-8. Um time não poderá ser inscrito duas vezes no mesmo campeonato.
+Para evitar registros repetidos, o mesmo time não poderá ser inscrito duas vezes no mesmo campeonato.
 
 ### Jogadores e elencos
 
-9. O sistema deverá permitir o cadastro de jogadores.
+Os jogadores serão cadastrados com nome, data de nascimento e posição.
 
-10. Cada jogador deverá possuir nome, data de nascimento e posição.
+Um jogador poderá participar de campeonatos diferentes, mas só poderá representar um time em cada campeonato.
 
-11. Um jogador poderá participar de campeonatos diferentes.
+Ao adicionar um jogador ao elenco, será necessário informar:
 
-12. Um jogador poderá representar apenas um time em cada campeonato.
+- o jogador;
+- o time;
+- o campeonato;
+- o número da camisa.
 
-13. O vínculo entre jogador, time e campeonato deverá registrar o
-número da camisa.
-
-14. Dois jogadores não poderão utilizar o mesmo número de camisa no
-mesmo time e campeonato.
+Dentro do mesmo time e campeonato, dois jogadores não poderão utilizar o mesmo número de camisa.
 
 ### Estádios
 
-15. O sistema deverá permitir o cadastro de estádios.
+O sistema também permitirá cadastrar os estádios onde as partidas serão realizadas.
 
-16. Cada estádio deverá possuir nome, cidade e capacidade.
-
-17. Um estádio poderá receber várias partidas.
+Cada estádio terá nome, cidade e capacidade. Um mesmo estádio poderá receber várias partidas.
 
 ### Partidas
 
-18. O sistema deverá permitir o cadastro de partidas.
+As partidas serão cadastradas com as seguintes informações:
 
-19. Cada partida deverá pertencer a um campeonato.
+- campeonato;
+- time mandante;
+- time visitante;
+- estádio;
+- rodada;
+- data;
+- horário;
+- status.
 
-20. Cada partida deverá possuir time mandante, time visitante, estádio,
-rodada, data, horário e status.
+O time mandante não poderá ser igual ao time visitante. Além disso, os dois times deverão estar inscritos no campeonato escolhido.
 
-21. O time mandante deverá ser diferente do time visitante.
+A partida poderá ter os seguintes status:
 
-22. Os times da partida deverão estar inscritos no campeonato.
+- agendada;
+- finalizada;
+- cancelada.
 
-23. Os possíveis status de uma partida serão: agendada, finalizada e
-cancelada.
-
-24. Quando uma partida for finalizada, o placar deverá ser informado.
+Quando uma partida for finalizada, o placar deverá ser informado.
 
 ### Gols
 
-25. O sistema deverá permitir o registro dos gols de uma partida.
+O sistema permitirá registrar os gols marcados em cada partida.
 
-26. Cada gol deverá indicar o jogador, o minuto e o tipo.
+Para cada gol, será informado:
 
-27. Os possíveis tipos de gol serão: normal, pênalti, falta e contra.
+- jogador;
+- minuto;
+- tipo do gol.
 
-28. O jogador vinculado ao gol deverá fazer parte do elenco de um dos
-times da partida.
+Os tipos de gol serão:
+
+- normal;
+- pênalti;
+- falta;
+- contra.
+
+O jogador relacionado ao gol deverá fazer parte do elenco de um dos times que estão disputando a partida.
 
 ### Consultas
 
-29. O sistema deverá permitir consultar os times inscritos em um
-campeonato.
+O sistema permitirá consultar:
 
-30. O sistema deverá permitir consultar o elenco de cada time.
+- os times inscritos em cada campeonato;
+- o elenco de cada time;
+- as partidas cadastradas;
+- a classificação do campeonato;
+- a artilharia.
 
-31. O sistema deverá permitir consultar as partidas cadastradas.
+Na classificação, a pontuação será calculada da seguinte forma:
 
-32. O sistema deverá apresentar a classificação do campeonato.
+- vitória: 3 pontos;
+- empate: 1 ponto;
+- derrota: 0 pontos.
 
-33. Uma vitória valerá três pontos.
-
-34. Um empate valerá um ponto.
-
-35. Uma derrota não acrescentará pontos.
-
-36. O sistema deverá apresentar a artilharia do campeonato.
-
-37. A artilharia será calculada pela quantidade de gols registrados
-para cada jogador.
+A artilharia será organizada de acordo com a quantidade de gols registrados para cada jogador.
