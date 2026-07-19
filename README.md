@@ -211,11 +211,60 @@ O sistema permite:
 
 ---
 
+## Sistema Central do Campeonato
+
+1. Login:
+
+![Tela de login](documentacao/imgs/login.png)
+
+2. Tela inicial:
+
+![Tela inicial](documentacao/imgs/tela_inicial.png)
+
+3. Campeonatos:
+
+![Campeonatos](documentacao/imgs/cadastro_campeonato.png)
+
+4. Times:
+
+![Times](documentacao/imgs/times.png)
+
+5. Jogadores:
+
+![Jogadores](documentacao/imgs/jogadores.png)
+
+6. Estádios:
+
+![Estadios](documentacao/imgs/estadios.png)
+
+7. Inscrições:
+
+![Inscrições](documentacao/imgs/inscricoes.png)
+
+8. Elencos:
+
+![Elencos](documentacao/imgs/elencos.png)
+
+9. Partidas:
+
+![Partidas](documentacao/imgs/partidas.png)
+
+10. Gols:
+
+![Gols](documentacao/imgs/gols.png)
+
+11. Consultas classificação:
+
+![Classificação](documentacao/imgs/classificacao.png)
+![Classificação](documentacao/imgs/classificacao(2).png)
+
+---
+
 ## Autores
 
 Projeto desenvolvido por:
 
 - **Clarissa Cesar Tomaz** — Matrícula: 22.1.8026
-- **Eduardo Ferreira Satler** — Matrícula: COLOCAR MATRÍCULA
+- **Eduardo Ferreira Satler** — Matrícula: -
 
 Trabalho desenvolvido para a disciplina de Banco de Dados.
