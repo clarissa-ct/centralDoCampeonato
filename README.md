@@ -2,7 +2,7 @@
 
 Sistema web desenvolvido para auxiliar na organização de campeonatos de futebol.
 
-O projeto permite cadastrar campeonatos, times, jogadores, estádios, partidas e gols. Também é possível inscrever times nos campeonatos, montar os elencos, registrar resultados e consultar a classificação e a artilharia.
+O projeto permite cadastrar campeonatos, times, jogadores, estádios, partidas e gols. Também é possível inscrever times nos campeonatos, montar os elencos, registrar os gols, finalizar as partidas e consultar a classificação e a artilharia.
 
 O sistema possui cadastro de usuários, tela de login e controle de acesso às páginas internas.
 
@@ -28,7 +28,6 @@ Os comandos de cadastro, alteração e consulta dos dados foram escritos diretam
 
 O diagrama apresenta as tabelas utilizadas no sistema e os relacionamentos existentes entre elas.
 
-![Diagrama do banco de dados](documentacao/diagramas/diagrama_conceitual_futgestor.drawio.png)
 
 ---
 
@@ -103,7 +102,7 @@ Na primeira execução, utilize esta ordem:
 02_povoamento.sql
 ```
 
-O arquivo `01_criacao.sql` cria as tabelas, as chaves e as restrições do banco.
+O arquivo `01_criacao.sql` cria as tabelas, as chaves, as restrições e as views que calculam os placares.
 
 O arquivo `02_povoamento.sql` adiciona dados para testes e demonstração do sistema.
 
@@ -204,8 +203,8 @@ O sistema permite:
 - inscrever times nos campeonatos;
 - montar os elencos;
 - cadastrar partidas;
-- registrar resultados;
-- registrar gols;
+- registrar gols nas partidas agendadas;
+- finalizar partidas pela tela de gols;
 - consultar a classificação;
 - consultar a artilharia.
 
