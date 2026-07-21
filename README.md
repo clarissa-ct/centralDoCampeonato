@@ -28,6 +28,7 @@ Os comandos de cadastro, alteração e consulta dos dados foram escritos diretam
 
 O diagrama apresenta as tabelas utilizadas no sistema e os relacionamentos existentes entre elas.
 
+![Diagrama do banco de dados](documentacao/diagramas/diagrama_conceitual_futgestor.drawio.png)
 
 ---
 
