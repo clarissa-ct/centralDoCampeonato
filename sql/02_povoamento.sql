@@ -1,6 +1,3 @@
--- Sistema de Gerenciamento de Campeonatos de Futebol
--- Script de povoamento do banco de dados
-
 INSERT INTO campeonato (id_campeonato, nome, ano, data_inicio, data_fim, status)
 VALUES
     (1, 'Copa Vale do Aço', 2026, '2026-03-01', '2026-06-30', 'em andamento');
@@ -62,15 +59,15 @@ VALUES
 
 INSERT INTO partida (
     id_partida, id_campeonato, id_estadio, id_time_mandante,
-    id_time_visitante, rodada, data_hora, gols_mandante, gols_visitante, status
+    id_time_visitante, rodada, data_hora, status
 )
 VALUES
-    (1, 1, 1, 1, 2, 1, '2026-03-15 15:00:00', 2, 0, 'finalizada'),
-    (2, 1, 2, 3, 4, 1, '2026-03-16 16:00:00', 1, 1, 'finalizada'),
-    (3, 1, 1, 2, 4, 2, '2026-03-22 15:00:00', 3, 2, 'finalizada'),
-    (4, 1, 2, 3, 1, 2, '2026-03-23 16:00:00', 1, 1, 'finalizada'),
-    (5, 1, 1, 1, 4, 3, '2026-03-29 15:00:00', NULL, NULL, 'agendada'),
-    (6, 1, 2, 2, 3, 3, '2026-03-30 16:00:00', NULL, NULL, 'agendada');
+    (1, 1, 1, 1, 2, 1, '2026-03-15 15:00:00', 'finalizada'),
+    (2, 1, 2, 3, 4, 1, '2026-03-16 16:00:00', 'finalizada'),
+    (3, 1, 1, 2, 4, 2, '2026-03-22 15:00:00', 'finalizada'),
+    (4, 1, 2, 3, 1, 2, '2026-03-23 16:00:00', 'finalizada'),
+    (5, 1, 1, 1, 4, 3, '2026-03-29 15:00:00', 'agendada'),
+    (6, 1, 2, 2, 3, 3, '2026-03-30 16:00:00', 'agendada');
 
 
 

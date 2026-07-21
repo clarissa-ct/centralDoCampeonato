@@ -1,7 +1,3 @@
--- Sistema de Gerenciamento de Campeonatos de Futebol
--- Principais consultas do sistema
-
-
 -- CONSULTA 1
 -- Listar os campeonatos cadastrados
 
@@ -88,7 +84,8 @@ ORDER BY
 
 
 -- CONSULTA 6
--- Listar todas as partidas
+-- Listar todas as partidas.
+-- O placar vem da view e é calculado pelos registros de gol.
 
 SELECT
     P.id_partida,
@@ -103,7 +100,7 @@ SELECT
     E.nome AS estadio,
     P.status
 FROM
-    partida P,
+    vw_partida_placar P,
     campeonato C,
     time M,
     time V,
@@ -117,7 +114,7 @@ ORDER BY P.data_hora;
 
 
 -- CONSULTA 7
--- Listar as partidas finalizadas
+-- Listar as partidas finalizadas com o placar calculado
 
 SELECT
     P.id_partida,
@@ -129,7 +126,7 @@ SELECT
     V.nome AS time_visitante,
     P.data_hora
 FROM
-    partida P,
+    vw_partida_placar P,
     campeonato C,
     time M,
     time V
@@ -168,44 +165,46 @@ ORDER BY P.data_hora;
 
 
 -- CONSULTA 9
--- Listar os gols registrados
+-- Listar os gols registrados, mostrando o time do jogador
+-- e o time para o qual o gol foi creditado
 
 SELECT
-    G.id_gol,
+    GD.id_gol,
     C.nome AS campeonato,
     M.nome AS time_mandante,
     V.nome AS time_visitante,
     J.nome AS jogador,
-    T.nome AS time_jogador,
-    G.minuto,
-    G.tipo
+    TJ.nome AS time_jogador,
+    TC.nome AS time_creditado,
+    GD.minuto,
+    GD.tipo
 FROM
-    gol G,
+    vw_gol_detalhado GD,
     partida P,
     campeonato C,
     jogador J,
-    elenco E,
-    time T,
+    time TJ,
+    time TC,
     time M,
     time V
 WHERE
-    G.id_partida = P.id_partida
+    GD.id_partida = P.id_partida
     AND P.id_campeonato = C.id_campeonato
-    AND G.id_jogador = J.id_jogador
-    AND E.id_campeonato = P.id_campeonato
-    AND E.id_jogador = G.id_jogador
-    AND E.id_time = T.id_time
+    AND GD.id_jogador = J.id_jogador
+    AND GD.id_time_jogador = TJ.id_time
+    AND GD.id_time_creditado = TC.id_time
     AND P.id_time_mandante = M.id_time
     AND P.id_time_visitante = V.id_time
 ORDER BY
     P.id_partida,
-    G.minuto,
-    G.id_gol;
+    GD.minuto,
+    GD.id_gol;
 
 
 -- CONSULTA 10
 -- Apresentar a artilharia do campeonato 1
--- Gols contra não são contabilizados
+-- Somente gols de partidas finalizadas são contabilizados.
+-- Gols contra não são contabilizados para o jogador.
 
 SELECT
     J.id_jogador,
@@ -225,6 +224,7 @@ WHERE
     AND E.id_jogador = G.id_jogador
     AND E.id_time = T.id_time
     AND P.id_campeonato = 1
+    AND P.status = 'finalizada'
     AND G.tipo <> 'contra'
 GROUP BY
     J.id_jogador,
@@ -237,6 +237,7 @@ ORDER BY
 
 -- CONSULTA 11
 -- Apresentar a classificação do campeonato 1
+-- O placar é obtido da view vw_partida_placar.
 -- Critérios:
 -- vitória = 3 pontos
 -- empate = 1 ponto
@@ -292,12 +293,11 @@ FROM
             P.gols_mandante AS gols_pro,
             P.gols_visitante AS gols_contra,
             3 AS pontos
-        FROM partida P
+        FROM vw_partida_placar P
         WHERE
             P.status = 'finalizada'
             AND P.gols_mandante
                 > P.gols_visitante
-
 
         UNION ALL
 
@@ -311,7 +311,7 @@ FROM
             P.gols_visitante AS gols_pro,
             P.gols_mandante AS gols_contra,
             0 AS pontos
-        FROM partida P
+        FROM vw_partida_placar P
         WHERE
             P.status = 'finalizada'
             AND P.gols_mandante
@@ -329,7 +329,7 @@ FROM
             P.gols_visitante AS gols_pro,
             P.gols_mandante AS gols_contra,
             3 AS pontos
-        FROM partida P
+        FROM vw_partida_placar P
         WHERE
             P.status = 'finalizada'
             AND P.gols_visitante
@@ -347,7 +347,7 @@ FROM
             P.gols_mandante AS gols_pro,
             P.gols_visitante AS gols_contra,
             0 AS pontos
-        FROM partida P
+        FROM vw_partida_placar P
         WHERE
             P.status = 'finalizada'
             AND P.gols_visitante
@@ -365,7 +365,7 @@ FROM
             P.gols_mandante AS gols_pro,
             P.gols_visitante AS gols_contra,
             1 AS pontos
-        FROM partida P
+        FROM vw_partida_placar P
         WHERE
             P.status = 'finalizada'
             AND P.gols_mandante
@@ -383,7 +383,7 @@ FROM
             P.gols_visitante AS gols_pro,
             P.gols_mandante AS gols_contra,
             1 AS pontos
-        FROM partida P
+        FROM vw_partida_placar P
         WHERE
             P.status = 'finalizada'
             AND P.gols_mandante

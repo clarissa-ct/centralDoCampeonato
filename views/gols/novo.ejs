@@ -21,7 +21,7 @@
             </a>
             <div>
                 <h1>Central do Campeonato</h1>
-                <p>Registro de gol</p>
+                <p>Registro dos gols e finalização da partida</p>
             </div>
         </div>
     </header>
@@ -30,25 +30,44 @@
         <nav class="trilha">
             <a href="/">Início</a> <span>/</span>
             <a href="/gols">Gols</a> <span>/</span>
-            <span>Novo</span>
+            <span>Gerenciar</span>
         </nav>
 
-        <section class="conteudo conteudo-form">
-            <h2>Registrar gol</h2>
+        <div class="barra-titulo">
+            <div>
+                <h2>Gerenciar gols</h2>
+                <p>
+                    Escolha uma partida, adicione os gols e finalize quando terminar.
+                </p>
+            </div>
+        </div>
 
-            <% if (erro) { %>
-                <div class="mensagem erro">
-                    <%= erro %>
-                </div>
-            <% } %>
+        <% if (erro) { %>
+            <div class="mensagem erro">
+                <%= erro %>
+            </div>
+        <% } %>
 
-            <% if (partidas.length === 0) { %>
-                <div class="mensagem erro">
-                    Não existem partidas finalizadas.
+        <% if (sucesso) { %>
+            <div class="mensagem sucesso">
+                Gol registrado com sucesso. Você pode adicionar outro gol ou finalizar a partida.
+            </div>
+        <% } %>
+
+        <section class="conteudo conteudo-gerenciar-gols">
+            <% if (partidas.length === 0 && !partida) { %>
+                <div class="vazio">
+                    <span class="vazio-icone">📅</span>
+                    <p>Não existem partidas agendadas para receber gols.</p>
+                    <a class="botao" href="/partidas/nova">Cadastrar nova partida</a>
                 </div>
             <% } else { %>
-                <form action="/gols" method="POST">
-                    <div class="campo">
+                <form
+                    class="seletor-partida"
+                    action="/gols/novo"
+                    method="GET"
+                >
+                    <div class="campo campo-seletor-partida">
                         <label for="id_partida">
                             Partida
                         </label>
@@ -58,181 +77,271 @@
                             name="id_partida"
                             required
                         >
-                            <option value="">Selecione</option>
+                            <option value="">Selecione uma partida</option>
 
-                            <% partidas.forEach((partida) => { %>
+                            <% partidas.forEach((item) => { %>
                                 <option
-                                    value="<%= partida.id_partida %>"
-                                    <%= String(dados.id_partida)
-                                        === String(partida.id_partida)
+                                    value="<%= item.id_partida %>"
+                                    <%= partida && String(partida.id_partida)
+                                        === String(item.id_partida)
                                         ? 'selected'
                                         : '' %>
                                 >
-                                    <%= partida.campeonato %>
+                                    <%= item.campeonato %>
                                     -
-                                    <%= partida.ano %>
+                                    <%= item.ano %>
                                     |
-                                    Rodada <%= partida.rodada %>
+                                    Rodada <%= item.rodada %>
                                     |
-                                    <%= partida.time_mandante %>
-                                    <%= partida.gols_mandante %>
+                                    <%= item.time_mandante %>
                                     x
-                                    <%= partida.gols_visitante %>
-                                    <%= partida.time_visitante %>
+                                    <%= item.time_visitante %>
+                                    |
+                                    <%= item.data_hora_formatada %>
                                 </option>
                             <% }) %>
                         </select>
                     </div>
 
-                    <div class="campo">
-                        <label for="id_jogador">
-                            Jogador
-                        </label>
-
-                        <select
-                            id="id_jogador"
-                            name="id_jogador"
-                            required
-                        >
-                            <option value="">Selecione</option>
-
-                            <% jogadores.forEach((item) => { %>
-                                <option
-                                    value="<%= item.id_jogador %>"
-                                    data-partida="<%= item.id_partida %>"
-                                    <%= String(dados.id_jogador)
-                                        === String(item.id_jogador)
-                                        ? 'selected'
-                                        : '' %>
-                                >
-                                    <%= item.jogador %>
-                                    -
-                                    <%= item.time %>
-                                    -
-                                    <%= item.posicao %>
-                                </option>
-                            <% }) %>
-                        </select>
-                    </div>
-
-                    <div class="grade-campos">
-                        <div class="campo campo-estreito">
-                            <label for="minuto">Minuto</label>
-
-                            <input
-                                type="number"
-                                id="minuto"
-                                name="minuto"
-                                min="0"
-                                step="1"
-                                value="<%= dados.minuto || '' %>"
-                                required
-                            >
-                        </div>
-
-                        <div class="campo">
-                            <label for="tipo">Tipo do gol</label>
-
-                            <select id="tipo" name="tipo" required>
-                                <option value="">Selecione</option>
-
-                                <option
-                                    value="normal"
-                                    <%= dados.tipo === 'normal'
-                                        ? 'selected'
-                                        : '' %>
-                                >
-                                    Normal
-                                </option>
-
-                                <option
-                                    value="pênalti"
-                                    <%= dados.tipo === 'pênalti'
-                                        ? 'selected'
-                                        : '' %>
-                                >
-                                    Pênalti
-                                </option>
-
-                                <option
-                                    value="falta"
-                                    <%= dados.tipo === 'falta'
-                                        ? 'selected'
-                                        : '' %>
-                                >
-                                    Falta
-                                </option>
-
-                                <option
-                                    value="contra"
-                                    <%= dados.tipo === 'contra'
-                                        ? 'selected'
-                                        : '' %>
-                                >
-                                    Contra
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="acoes">
-                        <button class="botao" type="submit">
-                            Registrar gol
-                        </button>
-
-                        <a
-                            class="botao secundario"
-                            href="/gols"
-                        >
-                            Cancelar
-                        </a>
-                    </div>
+                    <button class="botao" type="submit">
+                        Carregar partida
+                    </button>
                 </form>
+
+                <% if (partida) { %>
+                    <div class="painel-partida-gols">
+                        <div class="dados-partida-gols">
+                            <span>
+                                <strong><%= partida.campeonato %> - <%= partida.ano %></strong>
+                            </span>
+
+                            <span>Rodada <%= partida.rodada %></span>
+                            <span><%= partida.data_hora_formatada %></span>
+                        </div>
+
+                        <div class="placar-atual" aria-label="Placar atual">
+                            <span class="nome-time-placar"><%= partida.time_mandante %></span>
+                            <strong>
+                                <%= partida.gols_mandante %>
+                                x
+                                <%= partida.gols_visitante %>
+                            </strong>
+                            <span class="nome-time-placar"><%= partida.time_visitante %></span>
+                        </div>
+
+                        <p class="ajuda-placar">
+                            O placar acima é calculado automaticamente pelos gols registrados.
+                        </p>
+                    </div>
+
+                    <div class="grade-gerenciamento-gols">
+                        <section class="bloco-form-gol">
+                            <h3>Adicionar gol</h3>
+
+                            <% if (jogadores.length === 0) { %>
+                                <div class="mensagem erro">
+                                    Os times desta partida ainda não possuem jogadores no elenco.
+                                </div>
+                            <% } else { %>
+                                <form action="/gols" method="POST">
+                                    <input
+                                        type="hidden"
+                                        name="id_partida"
+                                        value="<%= partida.id_partida %>"
+                                    >
+
+                                    <div class="campo">
+                                        <label for="id_jogador">
+                                            Jogador
+                                        </label>
+
+                                        <select
+                                            id="id_jogador"
+                                            name="id_jogador"
+                                            required
+                                        >
+                                            <option value="">Selecione</option>
+
+                                            <% jogadores.forEach((item) => { %>
+                                                <option
+                                                    value="<%= item.id_jogador %>"
+                                                    <%= String(dados.id_jogador)
+                                                        === String(item.id_jogador)
+                                                        ? 'selected'
+                                                        : '' %>
+                                                >
+                                                    <%= item.time %>
+                                                    |
+                                                    Camisa <%= item.numero_camisa %>
+                                                    |
+                                                    <%= item.jogador %>
+                                                    -
+                                                    <%= item.posicao %>
+                                                </option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+
+                                    <div class="grade-campos">
+                                        <div class="campo campo-estreito">
+                                            <label for="minuto">Minuto</label>
+
+                                            <input
+                                                type="number"
+                                                id="minuto"
+                                                name="minuto"
+                                                min="0"
+                                                step="1"
+                                                value="<%= dados.minuto || '' %>"
+                                                required
+                                            >
+                                        </div>
+
+                                        <div class="campo">
+                                            <label for="tipo">Tipo do gol</label>
+
+                                            <select id="tipo" name="tipo" required>
+                                                <option value="">Selecione</option>
+
+                                                <option
+                                                    value="normal"
+                                                    <%= dados.tipo === 'normal'
+                                                        ? 'selected'
+                                                        : '' %>
+                                                >
+                                                    Normal
+                                                </option>
+
+                                                <option
+                                                    value="pênalti"
+                                                    <%= dados.tipo === 'pênalti'
+                                                        ? 'selected'
+                                                        : '' %>
+                                                >
+                                                    Pênalti
+                                                </option>
+
+                                                <option
+                                                    value="falta"
+                                                    <%= dados.tipo === 'falta'
+                                                        ? 'selected'
+                                                        : '' %>
+                                                >
+                                                    Falta
+                                                </option>
+
+                                                <option
+                                                    value="contra"
+                                                    <%= dados.tipo === 'contra'
+                                                        ? 'selected'
+                                                        : '' %>
+                                                >
+                                                    Contra
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <p class="texto-ajuda">
+                                        Em gols normais, de pênalti ou de falta, o gol é creditado ao time do jogador.
+                                        Em gol contra, ele é creditado automaticamente ao adversário.
+                                    </p>
+
+                                    <button class="botao" type="submit">
+                                        + Adicionar gol
+                                    </button>
+                                </form>
+                            <% } %>
+                        </section>
+
+                        <section class="bloco-lista-gols">
+                            <h3>Gols desta partida</h3>
+
+                            <% if (gols.length === 0) { %>
+                                <div class="vazio vazio-compacto">
+                                    <span class="vazio-icone">🥅</span>
+                                    <p>Nenhum gol registrado. A partida pode ser finalizada em 0 x 0.</p>
+                                </div>
+                            <% } else { %>
+                                <div class="tabela-responsiva">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Jogador</th>
+                                                <th>Time</th>
+                                                <th>Crédito</th>
+                                                <th>Minuto</th>
+                                                <th>Tipo</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <% gols.forEach((gol) => { %>
+                                                <tr>
+                                                    <td class="celula-forte"><%= gol.jogador %></td>
+                                                    <td><%= gol.time_jogador %></td>
+                                                    <td class="celula-forte"><%= gol.time_creditado %></td>
+                                                    <td><%= gol.minuto %>'</td>
+                                                    <td>
+                                                        <span class="badge badge-tipo-gol">
+                                                            <%= gol.tipo %>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <% } %>
+                        </section>
+                    </div>
+
+                    <div class="finalizar-partida">
+                        <div>
+                            <h3>Finalizar partida</h3>
+                            <p>
+                                Confira os gols. Depois da finalização, esta partida deixa de aceitar novos registros.
+                            </p>
+                        </div>
+
+                        <form
+                            id="form-finalizar"
+                            action="/gols/<%= partida.id_partida %>/finalizar"
+                            method="POST"
+                        >
+                            <button class="botao finalizar" type="submit">
+                                Finalizar partida
+                            </button>
+                        </form>
+                    </div>
+                <% } %>
             <% } %>
         </section>
+
+        <p class="voltar">
+            <a href="/gols">← Voltar para a lista de gols</a>
+        </p>
     </main>
 
     <script>
-        const partida = document.getElementById(
-            'id_partida'
+        const formFinalizar = document.getElementById(
+            'form-finalizar'
         );
 
-        const jogador = document.getElementById(
-            'id_jogador'
-        );
+        if (formFinalizar) {
+            formFinalizar.addEventListener(
+                'submit',
+                (evento) => {
+                    const confirmou = window.confirm(
+                        'Deseja finalizar a partida com o placar atual? Depois disso não será possível adicionar novos gols por esta tela.'
+                    );
 
-        function filtrarJogadores() {
-            const partidaSelecionada = partida.value;
-
-            Array.from(jogador.options).forEach((option) => {
-                if (!option.value) {
-                    option.hidden = false;
-                    return;
+                    if (!confirmou) {
+                        evento.preventDefault();
+                    }
                 }
-
-                option.hidden =
-                    option.dataset.partida
-                    !== partidaSelecionada;
-            });
-
-            const opcaoSelecionada =
-                jogador.options[jogador.selectedIndex];
-
-            if (
-                opcaoSelecionada &&
-                opcaoSelecionada.value &&
-                opcaoSelecionada.hidden
-            ) {
-                jogador.value = '';
-            }
+            );
         }
-
-        partida.addEventListener(
-            'change',
-            filtrarJogadores
-        );
-
-        filtrarJogadores();
     </script>
 </body>
 </html>

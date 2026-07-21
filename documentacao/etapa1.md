@@ -19,7 +19,7 @@ O **Central do Campeonato** é um sistema web criado para facilitar a organizaç
 
 A ideia é reunir, em um só lugar, as principais informações de um campeonato. No sistema será possível cadastrar campeonatos, times, jogadores, estádios, partidas e gols.
 
-Também será possível inscrever os times nos campeonatos, montar os elencos, registrar os resultados das partidas e acompanhar informações como a classificação e a artilharia.
+Também será possível inscrever os times nos campeonatos, montar os elencos, registrar os gols, finalizar as partidas e acompanhar informações como a classificação e a artilharia.
 
 O sistema será desenvolvido com **Node.js, Express, EJS e PostgreSQL**. A conexão com o banco de dados será feita utilizando o driver `pg`.
 
@@ -95,7 +95,7 @@ A partida poderá ter os seguintes status:
 - finalizada;
 - cancelada.
 
-Quando uma partida for finalizada, o placar deverá ser informado.
+Os gols serão registrados enquanto a partida estiver agendada. Ao concluir os registros, o usuário finalizará a partida pela tela de gols. O placar será calculado automaticamente a partir dos gols cadastrados.
 
 ### Gols
 
@@ -114,7 +114,7 @@ Os tipos de gol serão:
 - falta;
 - contra.
 
-O jogador relacionado ao gol deverá fazer parte do elenco de um dos times que estão disputando a partida.
+A interface mostrará somente os jogadores dos times que estão disputando a partida. Gols normais, de pênalti e de falta serão creditados ao time do jogador; gols contra serão creditados ao adversário.
 
 ### Consultas
 

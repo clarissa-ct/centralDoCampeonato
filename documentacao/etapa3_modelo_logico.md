@@ -250,8 +250,6 @@ PARTIDA(
     id_time_visitante FK,
     rodada,
     data_hora,
-    gols_mandante,
-    gols_visitante,
     status
 )
 ```
@@ -295,10 +293,9 @@ Essas chaves garantem que os dois times estejam inscritos no campeonato da parti
 Restrições:
 
 - o time mandante deverá ser diferente do time visitante;
-- a rodada deverá ser maior que zero;
-- os gols não poderão possuir valores negativos;
-- partidas agendadas ou canceladas não deverão possuir placar;
-- partidas finalizadas deverão possuir placar.
+- a rodada deverá ser maior que zero.
+
+O placar não é armazenado na relação `PARTIDA`. Ele é calculado a partir dos registros da relação `GOL` por meio das views `VW_GOL_DETALHADO` e `VW_PARTIDA_PLACAR`.
 
 Os possíveis valores para o status são:
 
@@ -347,9 +344,8 @@ REFERENCIA JOGADOR(id_jogador)
 Restrições:
 
 - o minuto do gol deverá ser maior ou igual a zero;
-- somente partidas finalizadas poderão receber gols;
-- a quantidade de gols registrados não poderá ultrapassar o placar da partida;
-- o jogador deverá fazer parte do elenco de um dos times participantes da partida.
+- os gols serão incluídos enquanto a partida estiver com status `agendada`;
+- após o usuário finalizar a partida, o status será alterado para `finalizada` e a interface não permitirá novos gols.
 
 Os possíveis tipos de gol são:
 
@@ -360,6 +356,10 @@ falta
 contra
 ```
 
-A verificação de que o jogador pertence ao elenco de um dos times da partida é realizada pela aplicação antes do registro do gol.
+A interface apresenta somente jogadores dos times envolvidos na partida.
+
+A view `VW_GOL_DETALHADO` identifica o time do jogador e calcula o time creditado: nos gols normais, de pênalti ou de falta, o crédito vai para o time do jogador; nos gols contra, vai para o adversário.
+
+A view `VW_PARTIDA_PLACAR` conta os gols creditados para calcular o placar das partidas finalizadas.
 
 Os gols do tipo `contra` não são considerados na consulta de artilharia.

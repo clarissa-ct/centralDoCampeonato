@@ -36,7 +36,7 @@
                 <h2>Partidas</h2>
 
                 <p>
-                    Jogos cadastrados nos campeonatos.
+                    Cadastre os jogos. Os placares são calculados pelos gols registrados.
                 </p>
             </div>
 
@@ -48,12 +48,6 @@
         <% if (sucesso) { %>
             <div class="mensagem sucesso">
                 Partida cadastrada com sucesso.
-            </div>
-        <% } %>
-
-        <% if (resultadoRegistrado) { %>
-            <div class="mensagem sucesso">
-                Resultado registrado com sucesso.
             </div>
         <% } %>
 
@@ -122,9 +116,9 @@
                                         <% if (partida.status === 'agendada') { %>
                                             <a
                                                 class="botao pequeno"
-                                                href="/partidas/<%= partida.id_partida %>/resultado"
+                                                href="/gols/novo?id_partida=<%= partida.id_partida %>"
                                             >
-                                                Registrar resultado
+                                                Registrar gols
                                             </a>
                                         <% } else { %>
                                             <span class="sem-acao">—</span>

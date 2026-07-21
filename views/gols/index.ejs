@@ -34,17 +34,23 @@
         <div class="barra-titulo">
             <div>
                 <h2>Gols</h2>
-                <p>Gols registrados nas partidas.</p>
+                <p>Registre os gols e finalize as partidas.</p>
             </div>
 
             <a class="botao" href="/gols/novo">
-                + Registrar gol
+                + Gerenciar gols
             </a>
         </div>
 
         <% if (sucesso) { %>
             <div class="mensagem sucesso">
                 Gol registrado com sucesso.
+            </div>
+        <% } %>
+
+        <% if (partidaFinalizada) { %>
+            <div class="mensagem sucesso">
+                Partida finalizada com sucesso. O placar foi calculado pelos gols registrados.
             </div>
         <% } %>
 
@@ -63,9 +69,11 @@
                                 <th>Campeonato</th>
                                 <th>Partida</th>
                                 <th>Jogador</th>
-                                <th>Time</th>
+                                <th>Time do jogador</th>
+                                <th>Gol creditado para</th>
                                 <th>Minuto</th>
                                 <th>Tipo</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
 
@@ -88,6 +96,8 @@
 
                                     <td><%= gol.time_jogador %></td>
 
+                                    <td class="celula-forte"><%= gol.time_creditado %></td>
+
                                     <td>
                                         <span class="minuto-gol"><%= gol.minuto %>'</span>
                                     </td>
@@ -95,6 +105,12 @@
                                     <td>
                                         <span class="badge badge-tipo-gol">
                                             <%= gol.tipo %>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge badge-<%= gol.status %>">
+                                            <%= gol.status %>
                                         </span>
                                     </td>
                                 </tr>

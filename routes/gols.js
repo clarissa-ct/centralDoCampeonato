@@ -10,16 +10,31 @@ const tiposPermitidos = [
     'contra'
 ];
 
-async function carregarOpcoes() {
-    const partidasResultado = await pool.query(`
+function formatarDataHora(dataHora) {
+    if (!dataHora) {
+        return '';
+    }
+
+    const data = new Date(dataHora);
+
+    return data.toLocaleString(
+        'pt-BR',
+        {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }
+    );
+}
+
+async function buscarPartidasAbertas() {
+    const resultado = await pool.query(`
         SELECT
             P.id_partida,
-            P.id_campeonato,
-            P.id_time_mandante,
-            P.id_time_visitante,
-            P.gols_mandante,
-            P.gols_visitante,
             P.rodada,
+            P.data_hora,
             C.nome AS campeonato,
             C.ano,
             M.nome AS time_mandante,
@@ -33,41 +48,192 @@ async function carregarOpcoes() {
             P.id_campeonato = C.id_campeonato
             AND P.id_time_mandante = M.id_time
             AND P.id_time_visitante = V.id_time
-            AND P.status = 'finalizada'
-        ORDER BY P.data_hora DESC
+            AND P.status = 'agendada'
+        ORDER BY
+            P.data_hora,
+            P.id_partida
     `);
 
-    const jogadoresResultado = await pool.query(`
-        SELECT
-            P.id_partida,
-            J.id_jogador,
-            J.nome AS jogador,
-            J.posicao,
-            T.id_time,
-            T.nome AS time
-        FROM
-            partida P,
-            elenco E,
-            jogador J,
-            time T
-        WHERE
-            E.id_campeonato = P.id_campeonato
-            AND (
-                E.id_time = P.id_time_mandante
-                OR E.id_time = P.id_time_visitante
-            )
-            AND E.id_jogador = J.id_jogador
-            AND E.id_time = T.id_time
-            AND P.status = 'finalizada'
-        ORDER BY
-            P.id_partida,
-            T.nome,
-            J.nome
-    `);
+    return resultado.rows.map((partida) => {
+        return {
+            ...partida,
+            data_hora_formatada:
+                formatarDataHora(partida.data_hora)
+        };
+    });
+}
+
+async function buscarPartidaAberta(idPartida) {
+    const resultado = await pool.query(
+        `
+            SELECT
+                P.id_partida,
+                P.id_campeonato,
+                P.id_time_mandante,
+                P.id_time_visitante,
+                P.rodada,
+                P.data_hora,
+                P.status,
+                C.nome AS campeonato,
+                C.ano,
+                M.nome AS time_mandante,
+                V.nome AS time_visitante,
+                SUM(
+                    CASE
+                        WHEN GD.id_time_creditado
+                            = P.id_time_mandante
+                            THEN 1
+                        ELSE 0
+                    END
+                )::INTEGER
+                    AS gols_mandante,
+                SUM(
+                    CASE
+                        WHEN GD.id_time_creditado
+                            = P.id_time_visitante
+                            THEN 1
+                        ELSE 0
+                    END
+                )::INTEGER
+                    AS gols_visitante
+            FROM
+                partida P
+                JOIN campeonato C
+                    ON C.id_campeonato = P.id_campeonato
+                JOIN time M
+                    ON M.id_time = P.id_time_mandante
+                JOIN time V
+                    ON V.id_time = P.id_time_visitante
+                LEFT JOIN vw_gol_detalhado GD
+                    ON GD.id_partida = P.id_partida
+            WHERE
+                P.id_partida = $1
+                AND P.status = 'agendada'
+            GROUP BY
+                P.id_partida,
+                P.id_campeonato,
+                P.id_time_mandante,
+                P.id_time_visitante,
+                P.rodada,
+                P.data_hora,
+                P.status,
+                C.nome,
+                C.ano,
+                M.nome,
+                V.nome
+        `,
+        [idPartida]
+    );
+
+    if (resultado.rowCount === 0) {
+        return null;
+    }
 
     return {
-        partidas: partidasResultado.rows,
-        jogadores: jogadoresResultado.rows
+        ...resultado.rows[0],
+        data_hora_formatada:
+            formatarDataHora(resultado.rows[0].data_hora)
+    };
+}
+
+async function buscarJogadoresDaPartida(idPartida) {
+    const resultado = await pool.query(
+        `
+            SELECT
+                J.id_jogador,
+                J.nome AS jogador,
+                J.posicao,
+                E.numero_camisa,
+                T.id_time,
+                T.nome AS time
+            FROM
+                partida P,
+                elenco E,
+                jogador J,
+                time T
+            WHERE
+                P.id_partida = $1
+                AND E.id_campeonato = P.id_campeonato
+                AND E.id_time IN (
+                    P.id_time_mandante,
+                    P.id_time_visitante
+                )
+                AND E.id_jogador = J.id_jogador
+                AND E.id_time = T.id_time
+            ORDER BY
+                T.nome,
+                E.numero_camisa,
+                J.nome
+        `,
+        [idPartida]
+    );
+
+    return resultado.rows;
+}
+
+async function buscarGolsDaPartida(idPartida) {
+    const resultado = await pool.query(
+        `
+            SELECT
+                GD.id_gol,
+                GD.minuto,
+                GD.tipo,
+                J.nome AS jogador,
+                TJ.nome AS time_jogador,
+                TC.nome AS time_creditado
+            FROM
+                vw_gol_detalhado GD,
+                jogador J,
+                time TJ,
+                time TC
+            WHERE
+                GD.id_partida = $1
+                AND GD.id_jogador = J.id_jogador
+                AND GD.id_time_jogador = TJ.id_time
+                AND GD.id_time_creditado = TC.id_time
+            ORDER BY
+                GD.minuto,
+                GD.id_gol
+        `,
+        [idPartida]
+    );
+
+    return resultado.rows;
+}
+
+async function carregarTela(idPartida) {
+    const partidas = await buscarPartidasAbertas();
+
+    if (!idPartida) {
+        return {
+            partidas,
+            partida: null,
+            jogadores: [],
+            gols: []
+        };
+    }
+
+    const partida = await buscarPartidaAberta(idPartida);
+
+    if (!partida) {
+        return {
+            partidas,
+            partida: null,
+            jogadores: [],
+            gols: []
+        };
+    }
+
+    const [jogadores, gols] = await Promise.all([
+        buscarJogadoresDaPartida(idPartida),
+        buscarGolsDaPartida(idPartida)
+    ]);
+
+    return {
+        partidas,
+        partida,
+        jogadores,
+        gols
     };
 }
 
@@ -75,44 +241,47 @@ router.get('/', async (req, res) => {
     try {
         const resultado = await pool.query(`
             SELECT
-                G.id_gol,
-                G.id_partida,
+                GD.id_gol,
+                GD.id_partida,
                 C.nome AS campeonato,
                 C.ano,
                 M.nome AS time_mandante,
                 V.nome AS time_visitante,
                 J.nome AS jogador,
-                T.nome AS time_jogador,
-                G.minuto,
-                G.tipo
+                TJ.nome AS time_jogador,
+                TC.nome AS time_creditado,
+                GD.minuto,
+                GD.tipo,
+                P.status
             FROM
-                gol G,
+                vw_gol_detalhado GD,
                 partida P,
                 campeonato C,
                 jogador J,
-                elenco E,
-                time T,
+                time TJ,
+                time TC,
                 time M,
                 time V
             WHERE
-                G.id_partida = P.id_partida
+                GD.id_partida = P.id_partida
                 AND P.id_campeonato = C.id_campeonato
-                AND G.id_jogador = J.id_jogador
-                AND E.id_campeonato = P.id_campeonato
-                AND E.id_jogador = G.id_jogador
-                AND E.id_time = T.id_time
+                AND GD.id_jogador = J.id_jogador
+                AND GD.id_time_jogador = TJ.id_time
+                AND GD.id_time_creditado = TC.id_time
                 AND P.id_time_mandante = M.id_time
                 AND P.id_time_visitante = V.id_time
             ORDER BY
                 P.id_partida,
-                G.minuto,
-                G.id_gol
+                GD.minuto,
+                GD.id_gol
         `);
 
         res.render('gols/index', {
             titulo: 'Gols',
             gols: resultado.rows,
-            sucesso: req.query.sucesso === '1'
+            sucesso: req.query.sucesso === '1',
+            partidaFinalizada:
+                req.query.finalizada === '1'
         });
     } catch (erro) {
         console.error(
@@ -127,24 +296,41 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/novo', async (req, res) => {
+    const idPartida = Number(req.query.id_partida);
+    const possuiPartida =
+        Number.isInteger(idPartida) &&
+        idPartida > 0;
+
     try {
-        const opcoes = await carregarOpcoes();
+        const tela = await carregarTela(
+            possuiPartida ? idPartida : null
+        );
+
+        let erro = null;
+
+        if (possuiPartida && !tela.partida) {
+            erro =
+                'A partida selecionada não está disponível para receber gols.';
+        }
 
         res.render('gols/novo', {
-            titulo: 'Registrar gol',
-            partidas: opcoes.partidas,
-            jogadores: opcoes.jogadores,
-            erro: null,
-            dados: {}
+            titulo: 'Gerenciar gols',
+            ...tela,
+            erro,
+            sucesso: req.query.sucesso === '1',
+            dados: {
+                id_partida:
+                    possuiPartida ? idPartida : ''
+            }
         });
     } catch (erro) {
         console.error(
-            'Erro ao carregar formulário de gol:',
+            'Erro ao carregar gerenciamento de gols:',
             erro
         );
 
         res.status(500).send(
-            'Não foi possível carregar o formulário.'
+            'Não foi possível carregar o gerenciamento de gols.'
         );
     }
 });
@@ -164,13 +350,11 @@ router.post('/', async (req, res) => {
         tipo
     };
 
+    const idPartida = Number(id_partida);
+    const idJogador = Number(id_jogador);
+    const minutoNumero = Number(minuto);
+
     try {
-        const opcoes = await carregarOpcoes();
-
-        const idPartida = Number(id_partida);
-        const idJogador = Number(id_jogador);
-        const minutoNumero = Number(minuto);
-
         if (
             !Number.isInteger(idPartida) ||
             !Number.isInteger(idJogador) ||
@@ -180,206 +364,41 @@ router.post('/', async (req, res) => {
             minutoNumero < 0 ||
             !tiposPermitidos.includes(tipo)
         ) {
+            const tela = await carregarTela(
+                Number.isInteger(idPartida) &&
+                idPartida > 0
+                    ? idPartida
+                    : null
+            );
+
             return res.status(400).render(
                 'gols/novo',
                 {
-                    titulo: 'Registrar gol',
-                    partidas: opcoes.partidas,
-                    jogadores: opcoes.jogadores,
+                    titulo: 'Gerenciar gols',
+                    ...tela,
                     erro:
                         'Preencha todos os campos corretamente.',
+                    sucesso: false,
                     dados
                 }
             );
         }
 
-        const partidaResultado = await pool.query(
-            `
-                SELECT
-                    P.id_partida,
-                    P.id_campeonato,
-                    P.id_time_mandante,
-                    P.id_time_visitante,
-                    P.gols_mandante,
-                    P.gols_visitante,
-                    P.status,
-                    E.id_time AS id_time_jogador
-                FROM
-                    partida P,
-                    elenco E
-                WHERE
-                    P.id_partida = $1
-                    AND E.id_campeonato
-                        = P.id_campeonato
-                    AND E.id_jogador = $2
-                    AND (
-                        E.id_time
-                            = P.id_time_mandante
-                        OR E.id_time
-                            = P.id_time_visitante
-                    )
-            `,
-            [
-                idPartida,
-                idJogador
-            ]
+        const partida = await buscarPartidaAberta(
+            idPartida
         );
 
-        if (partidaResultado.rowCount === 0) {
+        if (!partida) {
+            const tela = await carregarTela(null);
+
             return res.status(400).render(
                 'gols/novo',
                 {
-                    titulo: 'Registrar gol',
-                    partidas: opcoes.partidas,
-                    jogadores: opcoes.jogadores,
+                    titulo: 'Gerenciar gols',
+                    ...tela,
                     erro:
-                        'O jogador não pertence a um dos times da partida.',
-                    dados
-                }
-            );
-        }
-
-        const partida =
-            partidaResultado.rows[0];
-
-        if (partida.status !== 'finalizada') {
-            return res.status(400).render(
-                'gols/novo',
-                {
-                    titulo: 'Registrar gol',
-                    partidas: opcoes.partidas,
-                    jogadores: opcoes.jogadores,
-                    erro:
-                        'Somente partidas finalizadas podem receber gols.',
-                    dados
-                }
-            );
-        }
-
-        const golsRegistradosResultado =
-            await pool.query(
-                `
-                    SELECT
-                        G.tipo,
-                        E.id_time
-                            AS id_time_jogador
-                    FROM
-                        gol G,
-                        partida P,
-                        elenco E
-                    WHERE
-                        P.id_partida = $1
-                        AND G.id_partida
-                            = P.id_partida
-                        AND E.id_campeonato
-                            = P.id_campeonato
-                        AND E.id_jogador
-                            = G.id_jogador
-                        AND (
-                            E.id_time
-                                = P.id_time_mandante
-                            OR E.id_time
-                                = P.id_time_visitante
-                        )
-                `,
-                [idPartida]
-            );
-
-        let golsMandanteRegistrados = 0;
-        let golsVisitanteRegistrados = 0;
-
-        const idTimeMandante = Number(
-            partida.id_time_mandante
-        );
-
-        const idTimeVisitante = Number(
-            partida.id_time_visitante
-        );
-
-        golsRegistradosResultado.rows.forEach(
-            (gol) => {
-                const idTimeJogador = Number(
-                    gol.id_time_jogador
-                );
-
-                const jogadorEhMandante =
-                    idTimeJogador
-                    === idTimeMandante;
-
-                let golParaMandante;
-
-                if (gol.tipo === 'contra') {
-                    golParaMandante =
-                        !jogadorEhMandante;
-                } else {
-                    golParaMandante =
-                        jogadorEhMandante;
-                }
-
-                if (golParaMandante) {
-                    golsMandanteRegistrados += 1;
-                } else {
-                    golsVisitanteRegistrados += 1;
-                }
-            }
-        );
-
-        const idTimeJogador = Number(
-            partida.id_time_jogador
-        );
-
-        const jogadorEhMandante =
-            idTimeJogador === idTimeMandante;
-
-        let novoGolParaMandante;
-
-        if (tipo === 'contra') {
-            novoGolParaMandante =
-                !jogadorEhMandante;
-        } else {
-            novoGolParaMandante =
-                jogadorEhMandante;
-        }
-
-        const golsMandantePartida = Number(
-            partida.gols_mandante
-        );
-
-        const golsVisitantePartida = Number(
-            partida.gols_visitante
-        );
-
-        if (
-            novoGolParaMandante &&
-            golsMandanteRegistrados
-                >= golsMandantePartida
-        ) {
-            return res.status(400).render(
-                'gols/novo',
-                {
-                    titulo: 'Registrar gol',
-                    partidas: opcoes.partidas,
-                    jogadores: opcoes.jogadores,
-                    erro:
-                        'Todos os gols do time mandante já foram registrados.',
-                    dados
-                }
-            );
-        }
-
-        if (
-            !novoGolParaMandante &&
-            golsVisitanteRegistrados
-                >= golsVisitantePartida
-        ) {
-            return res.status(400).render(
-                'gols/novo',
-                {
-                    titulo: 'Registrar gol',
-                    partidas: opcoes.partidas,
-                    jogadores: opcoes.jogadores,
-                    erro:
-                        'Todos os gols do time visitante já foram registrados.',
+                        'A partida não está disponível para receber gols.',
+                    sucesso: false,
                     dados
                 }
             );
@@ -430,7 +449,7 @@ router.post('/', async (req, res) => {
         );
 
         return res.redirect(
-            '/gols?sucesso=1'
+            `/gols/novo?id_partida=${idPartida}&sucesso=1`
         );
     } catch (erro) {
         console.error(
@@ -474,16 +493,20 @@ router.post('/', async (req, res) => {
         }
 
         try {
-            const opcoes =
-                await carregarOpcoes();
+            const tela = await carregarTela(
+                Number.isInteger(idPartida) &&
+                idPartida > 0
+                    ? idPartida
+                    : null
+            );
 
             return res.status(400).render(
                 'gols/novo',
                 {
-                    titulo: 'Registrar gol',
-                    partidas: opcoes.partidas,
-                    jogadores: opcoes.jogadores,
+                    titulo: 'Gerenciar gols',
+                    ...tela,
                     erro: mensagem,
+                    sucesso: false,
                     dados
                 }
             );
@@ -497,6 +520,51 @@ router.post('/', async (req, res) => {
                 'Não foi possível carregar o formulário.'
             );
         }
+    }
+});
+
+router.post('/:id/finalizar', async (req, res) => {
+    const idPartida = Number(req.params.id);
+
+    if (
+        !Number.isInteger(idPartida) ||
+        idPartida <= 0
+    ) {
+        return res.status(400).send(
+            'Partida inválida.'
+        );
+    }
+
+    try {
+        const resultado = await pool.query(
+            `
+                UPDATE partida
+                SET status = 'finalizada'
+                WHERE
+                    id_partida = $1
+                    AND status = 'agendada'
+            `,
+            [idPartida]
+        );
+
+        if (resultado.rowCount === 0) {
+            return res.status(400).send(
+                'A partida não está disponível para finalização.'
+            );
+        }
+
+        return res.redirect(
+            '/gols?finalizada=1'
+        );
+    } catch (erro) {
+        console.error(
+            'Erro ao finalizar partida:',
+            erro
+        );
+
+        return res.status(500).send(
+            'Não foi possível finalizar a partida.'
+        );
     }
 });
 

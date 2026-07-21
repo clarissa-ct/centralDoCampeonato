@@ -1,19 +1,12 @@
--- Remoção das tabelas para teste
+DROP VIEW IF EXISTS vw_partida_placar;
+DROP VIEW IF EXISTS vw_gol_detalhado;
 
-DROP TABLE usuario;
-
-DROP TABLE gol;
-
-DROP TABLE partida;
-
-DROP TABLE elenco;
-
-DROP TABLE inscricao_time;
-
-DROP TABLE estadio;
-
-DROP TABLE jogador;
-
-DROP TABLE time;
-
-DROP TABLE campeonato;
+DROP TABLE IF EXISTS gol;
+DROP TABLE IF EXISTS partida;
+DROP TABLE IF EXISTS elenco;
+DROP TABLE IF EXISTS inscricao_time;
+DROP TABLE IF EXISTS estadio;
+DROP TABLE IF EXISTS jogador;
+DROP TABLE IF EXISTS time;
+DROP TABLE IF EXISTS campeonato;
+DROP TABLE IF EXISTS usuario;

@@ -106,7 +106,7 @@ router.get('/classificacao', async (req, res) => {
                         P.id_time_visitante,
                         P.gols_mandante,
                         P.gols_visitante
-                    FROM partida P
+                    FROM vw_partida_placar P
                     WHERE
                         P.id_campeonato = $1
                         AND P.status = 'finalizada'
@@ -322,6 +322,7 @@ router.get('/artilharia', async (req, res) => {
                     AND E.id_time
                         = T.id_time
                     AND P.id_campeonato = $1
+                    AND P.status = 'finalizada'
                     AND G.tipo <> 'contra'
                 GROUP BY
                     J.id_jogador,

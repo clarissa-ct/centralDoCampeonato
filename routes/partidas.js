@@ -115,7 +115,7 @@ router.get('/', async (req, res) => {
                 E.nome AS estadio,
                 P.status
             FROM
-                partida P,
+                vw_partida_placar P,
                 campeonato C,
                 time M,
                 time V,
@@ -142,9 +142,7 @@ router.get('/', async (req, res) => {
         res.render('partidas/index', {
             titulo: 'Partidas',
             partidas,
-            sucesso: req.query.sucesso === '1',
-            resultadoRegistrado:
-                req.query.resultado === '1'
+            sucesso: req.query.sucesso === '1'
         });
     } catch (erro) {
         console.error(
@@ -343,8 +341,6 @@ router.post('/', async (req, res) => {
                     id_time_visitante,
                     rodada,
                     data_hora,
-                    gols_mandante,
-                    gols_visitante,
                     status
                 )
                 VALUES (
@@ -355,8 +351,6 @@ router.post('/', async (req, res) => {
                     $5,
                     $6,
                     $7,
-                    NULL,
-                    NULL,
                     'agendada'
                 )
             `,
@@ -451,212 +445,6 @@ router.post('/', async (req, res) => {
 
             return res.status(500).send(
                 'Não foi possível carregar o formulário.'
-            );
-        }
-    }
-});
-
-router.get('/:id/resultado', async (req, res) => {
-    const idPartida = Number(req.params.id);
-
-    if (
-        !Number.isInteger(idPartida) ||
-        idPartida <= 0
-    ) {
-        return res.status(400).send(
-            'Partida inválida.'
-        );
-    }
-
-    try {
-        const partida = await buscarPartida(
-            idPartida
-        );
-
-        if (!partida) {
-            return res.status(404).send(
-                'Partida não encontrada.'
-            );
-        }
-
-        if (partida.status !== 'agendada') {
-            return res.status(400).send(
-                'Somente partidas agendadas podem receber resultado.'
-            );
-        }
-
-        return res.render(
-            'partidas/resultado',
-            {
-                titulo: 'Registrar resultado',
-                partida,
-                erro: null,
-                dados: {}
-            }
-        );
-    } catch (erro) {
-        console.error(
-            'Erro ao carregar a partida:',
-            erro
-        );
-
-        return res.status(500).send(
-            'Não foi possível carregar a partida.'
-        );
-    }
-});
-
-router.post('/:id/resultado', async (req, res) => {
-    const idPartida = Number(req.params.id);
-
-    const {
-        gols_mandante,
-        gols_visitante
-    } = req.body;
-
-    const dados = {
-        gols_mandante,
-        gols_visitante
-    };
-
-    if (
-        !Number.isInteger(idPartida) ||
-        idPartida <= 0
-    ) {
-        return res.status(400).send(
-            'Partida inválida.'
-        );
-    }
-
-    const golsMandante = Number(
-        gols_mandante
-    );
-
-    const golsVisitante = Number(
-        gols_visitante
-    );
-
-    try {
-        const partida = await buscarPartida(
-            idPartida
-        );
-
-        if (!partida) {
-            return res.status(404).send(
-                'Partida não encontrada.'
-            );
-        }
-
-        if (partida.status !== 'agendada') {
-            return res.status(400).send(
-                'Somente partidas agendadas podem receber resultado.'
-            );
-        }
-
-        if (
-            !Number.isInteger(golsMandante) ||
-            !Number.isInteger(golsVisitante) ||
-            golsMandante < 0 ||
-            golsVisitante < 0
-        ) {
-            return res.status(400).render(
-                'partidas/resultado',
-                {
-                    titulo:
-                        'Registrar resultado',
-                    partida,
-                    erro:
-                        'Os gols devem ser números inteiros maiores ou iguais a zero.',
-                    dados
-                }
-            );
-        }
-
-        const resultado = await pool.query(
-            `
-                UPDATE partida
-                SET
-                    gols_mandante = $1,
-                    gols_visitante = $2,
-                    status = 'finalizada'
-                WHERE
-                    id_partida = $3
-                    AND status = 'agendada'
-            `,
-            [
-                golsMandante,
-                golsVisitante,
-                idPartida
-            ]
-        );
-
-        if (resultado.rowCount === 0) {
-            return res.status(400).render(
-                'partidas/resultado',
-                {
-                    titulo:
-                        'Registrar resultado',
-                    partida,
-                    erro:
-                        'A partida não está disponível para receber resultado.',
-                    dados
-                }
-            );
-        }
-
-        return res.redirect(
-            '/partidas?resultado=1'
-        );
-    } catch (erro) {
-        console.error(
-            'Erro ao registrar resultado:',
-            erro
-        );
-
-        let mensagem =
-            'Não foi possível registrar o resultado.';
-
-        if (
-            erro.constraint
-                === 'ck_partida_gols_mandante'
-            ||
-            erro.constraint
-                === 'ck_partida_gols_visitante'
-        ) {
-            mensagem =
-                'A quantidade de gols não pode ser negativa.';
-        }
-
-        if (
-            erro.constraint
-            === 'ck_partida_placar'
-        ) {
-            mensagem =
-                'O placar informado não atende às regras da partida.';
-        }
-
-        try {
-            const partida =
-                await buscarPartida(idPartida);
-
-            return res.status(400).render(
-                'partidas/resultado',
-                {
-                    titulo:
-                        'Registrar resultado',
-                    partida,
-                    erro: mensagem,
-                    dados
-                }
-            );
-        } catch (erroConsulta) {
-            console.error(
-                'Erro ao recarregar a partida:',
-                erroConsulta
-            );
-
-            return res.status(500).send(
-                'Não foi possível carregar a partida.'
             );
         }
     }

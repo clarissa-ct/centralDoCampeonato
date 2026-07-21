@@ -1,5 +1,3 @@
--- Sistema de Gerenciamento de Campeonatos de Futebol
-
 CREATE TABLE usuario (
     id_usuario INTEGER,
     nome VARCHAR(100) NOT NULL,
@@ -12,6 +10,7 @@ CREATE TABLE usuario (
     CONSTRAINT uk_usuario_email
         UNIQUE (email)
 );
+
 
 CREATE TABLE campeonato (
     id_campeonato INTEGER,
@@ -97,12 +96,16 @@ CREATE TABLE estadio (
         CHECK (capacidade > 0)
 );
 
+
 CREATE TABLE inscricao_time (
     id_campeonato INTEGER NOT NULL,
     id_time INTEGER NOT NULL,
 
     CONSTRAINT pk_inscricao_time
-        PRIMARY KEY (id_campeonato, id_time),
+        PRIMARY KEY (
+            id_campeonato,
+            id_time
+        ),
 
     CONSTRAINT fk_inscricao_time_campeonato
         FOREIGN KEY (id_campeonato)
@@ -112,6 +115,7 @@ CREATE TABLE inscricao_time (
         FOREIGN KEY (id_time)
         REFERENCES time (id_time)
 );
+
 
 CREATE TABLE elenco (
     id_campeonato INTEGER NOT NULL,
@@ -162,8 +166,6 @@ CREATE TABLE partida (
     id_time_visitante INTEGER NOT NULL,
     rodada INTEGER NOT NULL,
     data_hora TIMESTAMP NOT NULL,
-    gols_mandante INTEGER,
-    gols_visitante INTEGER,
     status VARCHAR(20) NOT NULL,
 
     CONSTRAINT pk_partida
@@ -206,42 +208,12 @@ CREATE TABLE partida (
     CONSTRAINT ck_partida_rodada
         CHECK (rodada > 0),
 
-    CONSTRAINT ck_partida_gols_mandante
-        CHECK (
-            gols_mandante IS NULL
-            OR gols_mandante >= 0
-        ),
-
-    CONSTRAINT ck_partida_gols_visitante
-        CHECK (
-            gols_visitante IS NULL
-            OR gols_visitante >= 0
-        ),
-
     CONSTRAINT ck_partida_status
         CHECK (
             status IN (
                 'agendada',
                 'finalizada',
                 'cancelada'
-            )
-        ),
-
-    CONSTRAINT ck_partida_placar
-        CHECK (
-            (
-                status = 'finalizada'
-                AND gols_mandante IS NOT NULL
-                AND gols_visitante IS NOT NULL
-            )
-            OR
-            (
-                status IN (
-                    'agendada',
-                    'cancelada'
-                )
-                AND gols_mandante IS NULL
-                AND gols_visitante IS NULL
             )
         )
 );
@@ -278,3 +250,92 @@ CREATE TABLE gol (
             )
         )
 );
+
+
+CREATE VIEW vw_gol_detalhado AS
+SELECT
+    G.id_gol,
+    G.id_partida,
+    G.id_jogador,
+    G.minuto,
+    G.tipo,
+
+    P.id_campeonato,
+    P.id_time_mandante,
+    P.id_time_visitante,
+
+    E.id_time AS id_time_jogador,
+
+    CASE
+        WHEN G.tipo = 'contra'
+         AND E.id_time = P.id_time_mandante
+            THEN P.id_time_visitante
+
+        WHEN G.tipo = 'contra'
+         AND E.id_time = P.id_time_visitante
+            THEN P.id_time_mandante
+
+        ELSE E.id_time
+    END AS id_time_creditado
+
+FROM gol G
+
+JOIN partida P
+    ON P.id_partida = G.id_partida
+
+JOIN elenco E
+    ON E.id_campeonato = P.id_campeonato
+   AND E.id_jogador = G.id_jogador;
+
+
+CREATE VIEW vw_partida_placar AS
+SELECT
+    P.id_partida,
+    P.id_campeonato,
+    P.id_estadio,
+    P.id_time_mandante,
+    P.id_time_visitante,
+    P.rodada,
+    P.data_hora,
+    P.status,
+
+    CASE
+        WHEN P.status = 'finalizada' THEN
+            SUM(
+                CASE
+                    WHEN GD.id_time_creditado
+                        = P.id_time_mandante
+                        THEN 1
+                    ELSE 0
+                END
+            )::INTEGER
+        ELSE NULL
+    END AS gols_mandante,
+
+    CASE
+        WHEN P.status = 'finalizada' THEN
+            SUM(
+                CASE
+                    WHEN GD.id_time_creditado
+                        = P.id_time_visitante
+                        THEN 1
+                    ELSE 0
+                END
+            )::INTEGER
+        ELSE NULL
+    END AS gols_visitante
+
+FROM partida P
+
+LEFT JOIN vw_gol_detalhado GD
+    ON GD.id_partida = P.id_partida
+
+GROUP BY
+    P.id_partida,
+    P.id_campeonato,
+    P.id_estadio,
+    P.id_time_mandante,
+    P.id_time_visitante,
+    P.rodada,
+    P.data_hora,
+    P.status;
