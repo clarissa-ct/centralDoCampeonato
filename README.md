@@ -265,6 +265,6 @@ O sistema permite:
 Projeto desenvolvido por:
 
 - **Clarissa Cesar Tomaz** — Matrícula: 22.1.8026
-- **Eduardo Ferreira Satler** — Matrícula: -
+- **Eduardo Ferreira Satler** — Matrícula: 19.1.8980
 
 Trabalho desenvolvido para a disciplina de Banco de Dados.
