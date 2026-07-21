@@ -6,10 +6,8 @@
 
 **Integrantes:**
 
-- Clarissa Cesar Tomaz  
-- Eduardo Ferreira Satler  
-
-**Matrícula:** 22.1.8026
+- Clarissa Cesar Tomaz - 22.1.8026
+- Eduardo Ferreira Satler - 19.1.8980
 
 ---
 
